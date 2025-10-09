@@ -21,12 +21,15 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
     // InfoPage(),
   ];
 
-  final _titles = const ['Home', 'Menu', 'Location', 'Info'];
+  final _titles = const ['Crunchy', 'Menu', 'Location', 'Info'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_titles[_currentIndex])),
+      appBar: AppBar(
+        title: Text(_titles[_currentIndex]),
+        backgroundColor: Theme.of(context).colorScheme.primary,  
+      ),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -39,7 +42,7 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
             tooltip: 'Vai alla Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
+            icon: Icon(Icons.restaurant_menu),
             label: 'Menu',
             tooltip: 'Guarda il menù',
           ),

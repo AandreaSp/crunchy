@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bottom_bar.dart';
+import 'theme.dart';
 
 void main() => runApp(const CrunchyApp());
 
@@ -8,13 +9,8 @@ class CrunchyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.amber,
-          brightness: Brightness.light,
-        ),
-      ),
-      home: const CrunchyBottomBar(),
+      theme: AppTheme.app, 
+      home: const CrunchyBottomBar()
     );
   }
 }

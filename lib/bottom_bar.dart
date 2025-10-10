@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
-//import 'menu.dart';
+import 'menu.dart';
 //import 'location.dart';
 //import 'info.dart';
 
@@ -14,21 +14,23 @@ class CrunchyBottomBar extends StatefulWidget {
 class _CrunchyShellState extends State<CrunchyBottomBar> {
   int _currentIndex = 0;
 
-  final _pages = const [
-    HomePage(),
-    // MenuPage(),
-    // LocationPage(),
-    // InfoPage(),
+  void _openMenuTab() => setState(() => _currentIndex = 1);
+
+  late final List<Widget> _pages = <Widget>[
+    HomePage(onOpenMenu: _openMenuTab),
+    const MenuPage(),
+//    const LocationPage(),
+//    const InfoPage(),
   ];
 
-  final _titles = const ['Crunchy', 'Menu', 'Location', 'Info'];
+  final List<String> _titles = const ['Crunchy', 'Menu', 'Location', 'Info'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_currentIndex]),
-        backgroundColor: Theme.of(context).colorScheme.primary,  
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(

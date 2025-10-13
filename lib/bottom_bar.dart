@@ -19,8 +19,8 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
   late final List<Widget> _pages = <Widget>[
     HomePage(onOpenMenu: _openMenuTab),
     const MenuPage(),
-//    const LocationPage(),
-//    const InfoPage(),
+    //    const LocationPage(),
+    //    const InfoPage(),
   ];
 
   final List<String> _titles = const ['Crunchy', 'Menu', 'Location', 'Info'];
@@ -28,11 +28,7 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(_titles[_currentIndex]),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
+      appBar: AppBar(title: Text(_titles[_currentIndex])),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

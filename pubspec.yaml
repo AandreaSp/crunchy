@@ -58,13 +58,23 @@ flutter:
   uses-material-design: true
 
   assets:
-      - asset/home_image.png
-      - asset/menu_fritti.jpg
-      - asset/menu_panini.jpg
-      - asset/menu_carne.jpg
-      - asset/menu_dolci.jpg
-      - asset/menu_bevande.jpg
+      - asset/images/home_image.png
+      - asset/images/menu_fritti.jpg
+      - asset/images/menu_panini.jpg
+      - asset/images/menu_carne.jpg
+      - asset/images/menu_dolci.jpg
+      - asset/images/menu_bevande.jpg
 
+
+  fonts:
+    - family: Playfair Display
+      fonts:
+        - asset: asset/fonts/PlayfairDisplay-Regular.ttf
+        - asset: asset/fonts/PlayfairDisplay-Bold.ttf
+          weight: 700
+
+
+          
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

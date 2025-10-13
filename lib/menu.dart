@@ -6,11 +6,14 @@ class MenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categories = <MenuCategory>[
-      MenuCategory(title: 'FRITTI', imageAsset: 'asset/menu_fritti.jpg'),
-      MenuCategory(title: 'PANINI', imageAsset: 'asset/menu_panini.jpg'),
-      MenuCategory(title: 'CARNE', imageAsset: 'asset/menu_carne.jpg'),
-      MenuCategory(title: 'DOLCI', imageAsset: 'asset/menu_dolci.jpg'),
-      MenuCategory(title: 'BEVANDE', imageAsset: 'asset/menu_bevande.jpg'),
+      MenuCategory(title: 'FRITTI', imageAsset: 'asset/images/menu_fritti.jpg'),
+      MenuCategory(title: 'PANINI', imageAsset: 'asset/images/menu_panini.jpg'),
+      MenuCategory(title: 'CARNE', imageAsset: 'asset/images/menu_carne.jpg'),
+      MenuCategory(title: 'DOLCI', imageAsset: 'asset/images/menu_dolci.jpg'),
+      MenuCategory(
+        title: 'BEVANDE',
+        imageAsset: 'asset/images/menu_bevande.jpg',
+      ),
     ];
 
     return Scaffold(

@@ -29,6 +29,7 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(_titles[_currentIndex]),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),

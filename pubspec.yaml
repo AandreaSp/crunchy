@@ -59,6 +59,11 @@ flutter:
 
   assets:
       - asset/home_image.png
+      - asset/menu_fritti.jpg
+      - asset/menu_panini.jpg
+      - asset/menu_carne.jpg
+      - asset/menu_dolci.jpg
+      - asset/menu_bevande.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

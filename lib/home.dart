@@ -7,11 +7,14 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // immagine della home
             Padding(
               padding: const EdgeInsets.all(20),
               child: ClipRRect(
@@ -23,6 +26,8 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
+
+            // anteprima menù
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -41,6 +46,8 @@ class HomePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
+
+            // Categorie
             SizedBox(
               height: 80,
               child: ListView.separated(
@@ -53,16 +60,12 @@ class HomePage extends StatelessWidget {
                     return Material(
                       color: const Color.fromARGB(255, 255, 239, 214),
                       borderRadius: BorderRadius.circular(14),
-                      child: InkWell(
-                        onTap: onOpenMenu,
-                        borderRadius: BorderRadius.circular(14),
-                        child: const SizedBox(
-                          width: 56,
-                          height: 56,
-                          child: Icon(
-                            Icons.chevron_right,
-                            color: Color.fromARGB(255, 91, 61, 63),
-                          ),
+                      child: const SizedBox(
+                        width: 56,
+                        height: 56,
+                        child: Icon(
+                          Icons.chevron_right,
+                          color: Color.fromARGB(255, 91, 61, 63),
                         ),
                       ),
                     );
@@ -91,7 +94,12 @@ class HomePage extends StatelessWidget {
                             const SizedBox(width: 12),
                             CircleAvatar(
                               radius: 30,
-                              backgroundColor: Color.fromARGB(255, 255, 239, 214),
+                              backgroundColor: Color.fromARGB(
+                                255,
+                                255,
+                                239,
+                                214,
+                              ),
                               backgroundImage: AssetImage(c.imagePath),
                             ),
                             const SizedBox(width: 10),
@@ -112,6 +120,136 @@ class HomePage extends StatelessWidget {
                 },
               ),
             ),
+
+            // anteprima gps
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Material(
+                color: cs.surface,
+                borderRadius: BorderRadius.circular(16),
+                elevation: 2,
+                child: Ink(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // Background decorativo stile mappa
+                          Image.asset(
+                            'asset/images/map.png',
+                            fit: BoxFit.cover,
+                          ),
+                          // Velo per migliorare il contrasto
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.transparent],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Pin decorativo
+                          Positioned(
+                            left: 12,
+                            top: 12,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: const [
+                                  BoxShadow(
+                                    blurRadius: 6,
+                                    offset: Offset(0, 3),
+                                    color: Colors.black26,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                Icons.gps_fixed,
+                                color: cs.primary,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                          // Pannello inferiore con titolo e "pulsante" grafico
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Container(
+                              height: 72,
+                              decoration: BoxDecoration(
+                                color: cs.surface,
+                                borderRadius: const BorderRadius.vertical(
+                                  bottom: Radius.circular(16),
+                                ),
+                              ),
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                12,
+                                16,
+                                12,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Trova ristorante',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  IgnorePointer(
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: cs.primaryContainer,
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            blurRadius: 2,
+                                            offset: Offset(0, 1),
+                                            color: Colors.black12,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 35,
+                                          vertical: 10,
+                                        ),
+                                        child: Text(
+                                          'Vicino a te',
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -119,6 +257,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+// Modello categorie
 class FoodCategory {
   final String name;
   final String imagePath;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class EuroPrice extends StatelessWidget {
   final double value;
-  final double fontSize; // opzionale per varianti
+  final double fontSize; 
   const EuroPrice({super.key, required this.value, this.fontSize = 20});
 
   @override

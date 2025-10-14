@@ -64,6 +64,10 @@ flutter:
       - asset/images/menu_carne.jpg
       - asset/images/menu_dolci.jpg
       - asset/images/menu_bevande.jpg
+      - asset/images/fries/patatine_piene.png
+      - asset/images/fries/mozzarelline.png
+      - asset/images/fries/crocche.png
+      - asset/images/fries/wings.png
 
 
   fonts:

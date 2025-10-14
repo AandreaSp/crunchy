@@ -24,7 +24,7 @@ class MenuPage extends StatelessWidget {
           itemBuilder: (context, i) {
             final c = categories[i];
             return SizedBox(
-              height: 240, // opzionale: controlla l’altezza della card
+               
               child: CategoryCard(
                 title: c.title,
                 imageAsset: c.imageAsset, 

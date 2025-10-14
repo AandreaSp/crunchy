@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.all(30),
+              padding: const EdgeInsets.all(20),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
@@ -23,19 +23,22 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text('Menù', style: Theme.of(context).textTheme.titleLarge),
-                TextButton.icon(
-                  onPressed: onOpenMenu,
-                  icon: const Icon(Icons.menu),
-                  label: Text(
-                    'Vedi tutto',
-                    style: Theme.of(context).textTheme.titleMedium,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Menù', style: Theme.of(context).textTheme.titleMedium),
+                  TextButton.icon(
+                    onPressed: onOpenMenu,
+                    icon: const Icon(Icons.menu),
+                    label: Text(
+                      'Vedi tutto',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 12),
             SizedBox(
@@ -73,7 +76,9 @@ class HomePage extends StatelessWidget {
                       onTap: () {
                         if (c.name.toLowerCase() == 'fritti') {
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const FriesPage()),
+                            MaterialPageRoute(
+                              builder: (_) => const FriesPage(),
+                            ),
                           );
                         }
                       },
@@ -95,10 +100,7 @@ class HomePage extends StatelessWidget {
                                 c.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Color.fromARGB(255, 91, 61, 63),
-                                  fontWeight: FontWeight.w900,
-                                ),
+                                style: Theme.of(context).textTheme.titleSmall,
                               ),
                             ),
                             const SizedBox(width: 12),

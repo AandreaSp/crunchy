@@ -32,6 +32,13 @@ class AppTheme {
         height: 1.2,
         fontFamily: 'Playfair Display',
       ),
+      titleSmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w300,
+        color: Color.fromARGB(255, 91, 61, 63),
+        height: 1.2,
+        fontFamily: 'Playfair Display',
+      ),
       bodyLarge: TextStyle(
         fontSize: 16,
         height: 1.3,

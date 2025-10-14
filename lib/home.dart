@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'fries.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenMenu;
@@ -69,7 +70,13 @@ class HomePage extends StatelessWidget {
                     color: bg,
                     borderRadius: BorderRadius.circular(14),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        if (c.name.toLowerCase() == 'fritti') {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const FriesPage()),
+                          );
+                        }
+                      },
                       borderRadius: BorderRadius.circular(14),
                       child: SizedBox(
                         width: 160,

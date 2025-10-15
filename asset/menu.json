@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "title": "FRITTI",
+      "imageAsset": "asset/menu/fritti/menu_fritti.jpg"
+    },
+    {
+      "title": "PANINI",
+      "imageAsset": "asset/menu/panini/menu_panini.jpg"
+    },
+    {
+      "title": "CARNE",
+      "imageAsset": "asset/menu/carne/menu_carne.jpg"
+    },
+    {
+      "title": "DOLCI",
+      "imageAsset": "asset/menu/dolci/menu_dolci.jpg"
+    },
+    {
+      "title": "BEVANDE",
+      "imageAsset": "asset/menu/bevande/menu_bevande.jpg"
+    }
+  ]
+}

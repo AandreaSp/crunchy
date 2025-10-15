@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'bottom_bar.dart';
-import 'theme.dart';
+import 'widgets/bottom_bar.dart';
+import 'widgets/theme.dart';
 
 void main() => runApp(const CrunchyApp());
 

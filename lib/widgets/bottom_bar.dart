@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'menu.dart';
+import '../pages/home.dart';
+import '../pages/menu.dart';
 //import 'location.dart';
 //import 'info.dart';
 

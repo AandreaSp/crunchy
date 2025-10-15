@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  'asset/images/home_image.png',
+                  'asset/logo/home_image.png',
                   height: 200,
                   fit: BoxFit.cover,
                 ),
@@ -141,18 +141,14 @@ class HomePage extends StatelessWidget {
                         children: [
                           // Background decorativo stile mappa
                           Image.asset(
-                            'asset/images/map.png',
+                            'asset/mappa/map.png',
                             fit: BoxFit.cover,
                           ),
                           // Velo per migliorare il contrasto
                           Positioned.fill(
                             child: DecoratedBox(
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.transparent],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
+                                color: cs.surface.withValues(alpha: 0.25),
                               ),
                             ),
                           ),
@@ -266,7 +262,7 @@ class FoodCategory {
 }
 
 const categories = <FoodCategory>[
-  FoodCategory('Panini', 'asset/images/menu_panini.jpg', selected: true),
-  FoodCategory('Fritti', 'asset/images/menu_fritti.jpg'),
-  FoodCategory('Carne', 'asset/images/menu_carne.jpg'),
+  FoodCategory('Panini', 'asset/menu/panini/menu_panini.jpg', selected: true),
+  FoodCategory('Fritti', 'asset/menu/fritti/menu_fritti.jpg'),
+  FoodCategory('Carne', 'asset/menu/carne/menu_carne.jpg'),
 ];

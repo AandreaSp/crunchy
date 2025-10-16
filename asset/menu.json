@@ -37,36 +37,36 @@
   {
     "title": "SUPER CRUNCHY", 
     "price": 15.00, 
-    "description": "filetti di pollo dorati poggiati su lattuga, pomodori, e salsa iper cremosa alle erbe aromatiche", 
+    "description": "Filetti di pollo dorati, adagiati su lattuga croccante e pomodori maturi, avvolti da una salsa iper cremosa alle erbe aromatiche", 
     "image": "asset/menu/panini/crunchy.png",
     "category": "panini"
   },
   {
     "title": "The Sburger", 
     "price": 12.50, 
-    "description": "Hamburger di scottona con lattuga, pomodori, cipolla caramellata e salsa dello chef", 
+    "description": "Hamburger di scottona alla griglia su un letto di insalata fresca e pomodori di stagione, impreziosito da cipolle glassate e condita con la speciale salsa dello chef, ricca e cremosa", 
     "image": "asset/menu/panini/sburger.png",
     "category": "panini"
   },
   {
     "title": "Veggy Burger", 
     "price": 10.00, 
-    "description": "Hamburger vegano con lattuga, funghi porcini, cipolla rossa in agrodolce e salsa tzatziki", 
+    "description": "Burger 100% vegetale alla piastra, posizionato su letto di insalata fresca e funghi porcini profumati, completato da cipolla rossa in agrodolce e dalla nostra tzatziki vegana, cremosa e rinfrescante", 
     "image": "asset/menu/panini/veggy.png",
     "category": "panini"
   },
   {
-    "title": "CHICCO", 
-    "price": 7.50, 
-    "description": "Wurstel alla griglia, cipolle caramellate, cheddar fuso e mayo affumicata", 
-    "image": "asset/menu/panini/hot_dog.png",
+    "title": "L'amatriciccio", 
+    "price": 14.50, 
+    "description": "Un soffice bun accoglie un succulento patty di manzo, arricchito dal sapore deciso del guanciale e dalla salsa all'amatriciana by Cicciogamer89. Il tutto è completato da scaglie di Pecorino Romano  ", 
+    "image": "asset/menu/panini/amatriciccio.png",
     "category": "panini"
   },
   {
-    "title": "The Renzi's", 
-    "price": 7.50, 
-    "description": "Wurstel alla piastra, iceberg, cetriolini, pomodoro e salsa yogurt aromatizzata", 
-    "image": "asset/menu/panini/hot_dog_2.png",
+    "title": "Il Carbonaro", 
+    "price": 14.50, 
+    "description": "Bun al carbone vegetale, burger di manzo succoso, guanciale croccante e scaglie di Pecorino Romano, carbo-crema e pepe macinato al momento", 
+    "image": "asset/menu/panini/carbonaro.png",
     "category": "panini"
   },
   {

@@ -96,5 +96,65 @@
     "description": "Grigliata mista di wurstel e verdure", 
     "image": "asset/menu/carne/wurstel.png",
     "category": "carne"
+  },
+  {
+    "title": "Cheesecake CRUNCHY",
+    "price": 2.00,
+    "image": "asset/menu/dolci/cheesecake.png",
+    "category": "dolci"
+  },
+  {
+    "title": "Tiramisù",
+    "price": 4.50,
+    "image": "asset/menu/dolci/tiramisu.png",
+    "category": "dolci"
+  },
+  {
+    "title": "Brownies", 
+    "price": 4.50,  
+    "image": "asset/menu/dolci/brownies.png",
+    "category": "dolci"
+  },
+  {
+    "title": "Iginio's monthly cake", 
+    "price": 8.00,
+    "image": "asset/menu/dolci/iginio.png",
+    "category": "dolci"
+  },
+  {
+    "title": "Coca Cola", 
+    "price": 3.00,
+    "image": "asset/menu/bevande/cochina.png",
+    "category": "bevande"
+  },
+  {
+    "title": "Estathè", 
+    "price": 3.00,
+    "image": "asset/menu/bevande/the.png",
+    "category": "bevande"
+  },
+  {
+    "title": "Fanta", 
+    "price": 3.00,
+    "image": "asset/menu/bevande/fanta.png",
+    "category": "bevande"
+  },
+  {
+    "title": "Acqua 0,5L", 
+    "price": 1.00,
+    "image": "asset/menu/bevande/acqua.png",
+    "category": "bevande"
+  },
+  {
+    "title": "Acqua 1L", 
+    "price": 2.00,
+    "image": "asset/menu/bevande/acqua.png",
+    "category": "bevande"
+  },
+  {
+    "title": "Birra (a scelta) 0,5L", 
+    "price": 4.50,
+    "image": "asset/menu/bevande/birre.png",
+    "category": "bevande"
   }
 ]

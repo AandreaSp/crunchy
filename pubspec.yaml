@@ -46,6 +46,9 @@ flutter:
     # Cartella per le foto delle bevande
     - asset/menu/bevande/
 
+  # Cartella per il menu
+    - asset/recensioni/
+
     # Json
     - asset/menu_card.json
     - asset/menu.json

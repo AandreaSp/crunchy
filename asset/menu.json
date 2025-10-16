@@ -33,5 +33,68 @@
     "description": "5 per porzione", 
     "image": "asset/menu/fritti/wings.png",
     "category": "fritti"
+  },
+  {
+    "title": "SUPER CRUNCHY", 
+    "price": 15.00, 
+    "description": "filetti di pollo dorati poggiati su lattuga, pomodori, e salsa iper cremosa alle erbe aromatiche", 
+    "image": "asset/menu/panini/crunchy.png",
+    "category": "panini"
+  },
+  {
+    "title": "The Sburger", 
+    "price": 12.50, 
+    "description": "Hamburger di scottona con lattuga, pomodori, cipolla caramellata e salsa dello chef", 
+    "image": "asset/menu/panini/sburger.png",
+    "category": "panini"
+  },
+  {
+    "title": "Veggy Burger", 
+    "price": 10.00, 
+    "description": "Hamburger vegano con lattuga, funghi porcini, cipolla rossa in agrodolce e salsa tzatziki", 
+    "image": "asset/menu/panini/veggy.png",
+    "category": "panini"
+  },
+  {
+    "title": "CHICCO", 
+    "price": 7.50, 
+    "description": "Wurstel alla griglia, cipolle caramellate, cheddar fuso e mayo affumicata", 
+    "image": "asset/menu/panini/hot_dog.png",
+    "category": "panini"
+  },
+  {
+    "title": "The Renzi's", 
+    "price": 7.50, 
+    "description": "Wurstel alla piastra, iceberg, cetriolini, pomodoro e salsa yogurt aromatizzata", 
+    "image": "asset/menu/panini/hot_dog_2.png",
+    "category": "panini"
+  },
+  {
+    "title": "Crunchy Deluxe", 
+    "price": 25.00, 
+    "description": "Servita con una porzione abbondante di patate al forno", 
+    "image": "asset/menu/carne/crunchy_d.png",
+    "category": "carne"
+  },
+  {
+    "title": "Stox", 
+    "price": 70.00, 
+    "description": "Taglio da 2kg servito con verdure fresche di stagione", 
+    "image": "asset/menu/carne/fiorentina.png",
+    "category": "carne"
+  },
+  {
+    "title": "Kobe Bryant", 
+    "price": 150.00, 
+    "description": "300gr di carne di wagyu.", 
+    "image": "asset/menu/carne/wagyu.png",
+    "category": "carne"
+  },
+  {
+    "title": "Royale Brace", 
+    "price": 14.00, 
+    "description": "Grigliata mista di wurstel e verdure", 
+    "image": "asset/menu/carne/wurstel.png",
+    "category": "carne"
   }
 ]

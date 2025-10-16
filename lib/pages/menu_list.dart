@@ -22,6 +22,7 @@ class MenuListPage extends StatelessWidget {
       case 'bevande':
         return DescriptionPlacement.none;
       case 'dolci':
+        return DescriptionPlacement.none;
       case 'panini':
         return DescriptionPlacement.underTitle;
       default:

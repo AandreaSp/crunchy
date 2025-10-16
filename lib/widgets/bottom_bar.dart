@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../pages/home.dart';
 import '../pages/menu.dart';
-//import 'location.dart';
-//import 'info.dart';
+import '../pages/location.dart';
+import '../pages/info.dart';
 
 class CrunchyBottomBar extends StatefulWidget {
   const CrunchyBottomBar({super.key});
@@ -19,8 +19,8 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
   late final List<Widget> _pages = <Widget>[
     HomePage(onOpenMenu: _openMenuTab),
     const MenuPage(),
-    //    const LocationPage(),
-    //    const InfoPage(),
+    const LocationPage(),
+    const InfoPage(),
   ];
 
   final List<String> _titles = const ['Crunchy', 'Menu', 'Location', 'Info'];

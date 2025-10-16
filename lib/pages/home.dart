@@ -60,12 +60,16 @@ class HomePage extends StatelessWidget {
                     return Material(
                       color: const Color.fromARGB(255, 255, 239, 214),
                       borderRadius: BorderRadius.circular(14),
-                      child: const SizedBox(
-                        width: 56,
-                        height: 56,
-                        child: Icon(
-                          Icons.chevron_right,
-                          color: Color.fromARGB(255, 91, 61, 63),
+                      child: InkWell(
+                        onTap: onOpenMenu,
+                        borderRadius: BorderRadius.circular(14),
+                        child: const SizedBox(
+                          width: 56,
+                          height: 56,
+                          child: Icon(
+                            Icons.chevron_right,
+                            color: Color.fromARGB(255, 91, 61, 63),
+                          ),
                         ),
                       ),
                     );
@@ -139,12 +143,7 @@ class HomePage extends StatelessWidget {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // Background decorativo stile mappa
-                          Image.asset(
-                            'asset/mappa/map.png',
-                            fit: BoxFit.cover,
-                          ),
-                          // Velo per migliorare il contrasto
+                          Image.asset('asset/mappa/map.png', fit: BoxFit.cover),
                           Positioned.fill(
                             child: DecoratedBox(
                               decoration: BoxDecoration(
@@ -152,7 +151,6 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          // Pin decorativo
                           Positioned(
                             left: 12,
                             top: 12,
@@ -176,7 +174,6 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          // Pannello inferiore con titolo e "pulsante" grafico
                           Align(
                             alignment: Alignment.bottomCenter,
                             child: Container(

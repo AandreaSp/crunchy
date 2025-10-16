@@ -1,5 +1,5 @@
+import 'package:crunchy/pages/menu_list.dart';
 import 'package:flutter/material.dart';
-import 'fries.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenMenu;
@@ -81,10 +81,30 @@ class HomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     child: InkWell(
                       onTap: () {
-                        if (c.name.toLowerCase() == 'fritti') {
+                        final name = c.name.trim().toLowerCase();
+                        if (name == 'fritti') {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => const FriesPage(),
+                              builder: (_) => const MenuListPage(
+                                category: 'fritti',
+                                title: 'Fritti',
+                              ),
+                            ),
+                          );
+                        } else if(name == 'panini') {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const MenuListPage(
+                                category: 'panini', 
+                                title: 'Panini'),
+                            ),
+                          );
+                        } else if(name == 'carne') {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const MenuListPage(
+                                category: 'carne', 
+                                title: 'Carne'),
                             ),
                           );
                         }
@@ -254,12 +274,11 @@ class HomePage extends StatelessWidget {
 class FoodCategory {
   final String name;
   final String imagePath;
-  final bool selected;
-  const FoodCategory(this.name, this.imagePath, {this.selected = false});
+  const FoodCategory(this.name, this.imagePath);
 }
 
 const categories = <FoodCategory>[
-  FoodCategory('Panini', 'asset/menu/panini/menu_panini.jpg', selected: true),
+  FoodCategory('Panini', 'asset/menu/panini/menu_panini.jpg'),
   FoodCategory('Fritti', 'asset/menu/fritti/menu_fritti.jpg'),
   FoodCategory('Carne', 'asset/menu/carne/menu_carne.jpg'),
 ];

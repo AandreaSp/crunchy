@@ -5,7 +5,7 @@ class ProductCard extends StatelessWidget {
   final String imageAsset;
   final String title;
   final double price;
-  final String meta; 
+  final String? description; 
   final VoidCallback? onTap;
   final double aspectRatio;
 
@@ -14,7 +14,7 @@ class ProductCard extends StatelessWidget {
     required this.imageAsset,
     required this.title,
     required this.price,
-    required this.meta,
+    required this.description,
     this.onTap,
     this.aspectRatio = 16 / 9,
   });
@@ -64,7 +64,7 @@ class ProductCard extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: Text(
-                meta,
+                description!,
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.right,
               ),

@@ -47,7 +47,7 @@ flutter:
     - asset/menu/bevande/
 
     # Json
-    - asset/fritti.json
+    - asset/menu_card.json
     - asset/menu.json
 
   fonts:

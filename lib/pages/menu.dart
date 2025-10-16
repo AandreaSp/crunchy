@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/category_card.dart';
-import '../data/menu_repository.dart';
-import '../models/menu_category.dart';
+import '../data/card_menu_repo.dart';
+import '../models/card_menu_category.dart';
 import 'fries.dart';
 
 class MenuPage extends StatelessWidget {

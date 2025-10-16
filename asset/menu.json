@@ -1,24 +1,37 @@
-{
-  "categories": [
-    {
-      "title": "FRITTI",
-      "imageAsset": "asset/menu/fritti/menu_fritti.jpg"
-    },
-    {
-      "title": "PANINI",
-      "imageAsset": "asset/menu/panini/menu_panini.jpg"
-    },
-    {
-      "title": "CARNE",
-      "imageAsset": "asset/menu/carne/menu_carne.jpg"
-    },
-    {
-      "title": "DOLCI",
-      "imageAsset": "asset/menu/dolci/menu_dolci.jpg"
-    },
-    {
-      "title": "BEVANDE",
-      "imageAsset": "asset/menu/bevande/menu_bevande.jpg"
-    }
-  ]
-}
+[
+  { 
+    "title": "PATATINE FRITTE", 
+    "price": 3.50, 
+    "unit": "porzione", 
+    "image": "asset/menu/fritti/menu_fritti.jpg",
+    "category": "fritti"
+  },
+  { 
+    "title": "PATATINE CHEDDAR E BACON", 
+    "price": 5.00, 
+    "unit": "porzione", 
+    "image": "asset/menu/fritti/patatine_piene.png",
+    "category": "fritti" 
+  },
+  { 
+    "title": "MOZZARELLINE", 
+    "price": 4.00, 
+    "unit": "6 per porzione", 
+    "image": "asset/menu/fritti/mozzarelline.png",
+    "category": "fritti"
+  },
+  { 
+    "title": "CROCCHÈ", 
+    "price": 2.50, 
+    "unit": "porzione", 
+    "image": "asset/menu/fritti/crocche.png",
+    "category": "fritti"
+  },
+  { 
+    "title": "ALETTE DI POLLO", 
+    "price": 4.50, 
+    "unit": "5 per porzione", 
+    "image": "asset/menu/fritti/wings.png",
+    "category": "fritti"
+  }
+]

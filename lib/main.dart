@@ -9,6 +9,7 @@ class CrunchyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.app, 
       home: const CrunchyBottomBar()
     );

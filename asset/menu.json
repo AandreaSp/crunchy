@@ -2,35 +2,35 @@
   { 
     "title": "PATATINE FRITTE", 
     "price": 3.50, 
-    "unit": "porzione", 
+    "description": "porzione", 
     "image": "asset/menu/fritti/menu_fritti.jpg",
     "category": "fritti"
   },
   { 
     "title": "PATATINE CHEDDAR E BACON", 
     "price": 5.00, 
-    "unit": "porzione", 
+    "description": "porzione", 
     "image": "asset/menu/fritti/patatine_piene.png",
     "category": "fritti" 
   },
   { 
     "title": "MOZZARELLINE", 
     "price": 4.00, 
-    "unit": "6 per porzione", 
+    "description": "6 per porzione", 
     "image": "asset/menu/fritti/mozzarelline.png",
     "category": "fritti"
   },
   { 
     "title": "CROCCHÈ", 
     "price": 2.50, 
-    "unit": "porzione", 
+    "description": "porzione", 
     "image": "asset/menu/fritti/crocche.png",
     "category": "fritti"
   },
   { 
     "title": "ALETTE DI POLLO", 
     "price": 4.50, 
-    "unit": "5 per porzione", 
+    "description": "5 per porzione", 
     "image": "asset/menu/fritti/wings.png",
     "category": "fritti"
   }

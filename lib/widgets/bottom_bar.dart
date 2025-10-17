@@ -15,9 +15,10 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
   int _currentIndex = 0;
 
   void _openMenuTab() => setState(() => _currentIndex = 1);
+  void _openLocationTab() => setState(() => _currentIndex = 2);
 
   late final List<Widget> _pages = <Widget>[
-    HomePage(onOpenMenu: _openMenuTab),
+    HomePage(onOpenMenu: _openMenuTab, onOpenLocation: _openLocationTab,),
     const MenuPage(),
     const LocationPage(),
     const InfoPage(),

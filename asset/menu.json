@@ -58,14 +58,14 @@
   {
     "title": "L'amatriciccio", 
     "price": 14.50, 
-    "description": "Un soffice bun accoglie un succulento patty di manzo, arricchito dal sapore deciso del guanciale e dalla salsa all'amatriciana by Cicciogamer89. Il tutto è completato da scaglie di Pecorino Romano  ", 
+    "description": "Un soffice bun accoglie un succulento patty di manzo, arricchito dal sapore deciso del guanciale e dalla salsa all'amatriciana by Cicciogamer89. Il tutto è completato da scaglie di Pecorino Romano", 
     "image": "asset/menu/panini/amatriciccio.png",
     "category": "panini"
   },
   {
     "title": "Il Carbonaro", 
     "price": 14.50, 
-    "description": "Bun al carbone vegetale, burger di manzo succoso, guanciale croccante e scaglie di Pecorino Romano, carbo-crema e pepe macinato al momento", 
+    "description": "Uno spaziale bun al carbone vegetale abbraccia un burger di manzo succoso, sormontato da guanciale di Norcia tagliato a mano. Scaglie di Pecorino Romano regalano sapidità elegante, mentre la carbo-crema avvolge il tutto con una morbidezza irresistibile. Per concludere con un tocco deciso: un giro di pepe macinato al momento", 
     "image": "asset/menu/panini/carbonaro.png",
     "category": "panini"
   },

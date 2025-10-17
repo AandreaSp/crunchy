@@ -11,12 +11,12 @@ class SimpleCard extends StatelessWidget {
    return Material(
   color: bg,
   elevation: 8,
-  shadowColor: Colors.black.withOpacity(0.12),
+  shadowColor: Colors.black,
   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
   clipBehavior: Clip.antiAlias,
   child: DecoratedBox(
     decoration: BoxDecoration(
-      border: Border.all(color: Colors.white.withOpacity(0.18)),
+      border: Border.all(color: Colors.white),
       borderRadius: BorderRadius.circular(20),
     ),
     child: child,

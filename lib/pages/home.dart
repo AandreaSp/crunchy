@@ -4,7 +4,12 @@ import 'package:crunchy/widgets/review_card.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenMenu;
-  const HomePage({super.key, required this.onOpenMenu});
+  final VoidCallback onOpenLocation;
+  const HomePage({
+    super.key,
+    required this.onOpenMenu,
+    required this.onOpenLocation,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -235,31 +240,35 @@ class HomePage extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(width: 12),
-                                      IgnorePointer(
-                                        child: DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            color: cs.primaryContainer,
-                                            borderRadius: BorderRadius.circular(
-                                              999,
-                                            ),
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                blurRadius: 2,
-                                                offset: Offset(0, 1),
-                                                color: Colors.black12,
-                                              ),
-                                            ],
+                                      Material(
+                                        color: cs.primaryContainer,
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
+                                        elevation:
+                                            0, // opzionale, lasci la shadow sotto
+                                        child: InkWell(
+                                          onTap:
+                                              onOpenLocation, // usa il callback per aprire la tab Location
+                                          borderRadius: BorderRadius.circular(
+                                            999,
                                           ),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 35,
+                                              horizontal: 30,
                                               vertical: 10,
                                             ),
-                                            child: Text(
-                                              'Vicino a te',
-                                              style: Theme.of(
-                                                context,
-                                              ).textTheme.titleMedium,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  'vicino a te',
+                                                  style: Theme.of(
+                                                    context,
+                                                  ).textTheme.titleMedium,
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),

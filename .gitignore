@@ -32,6 +32,10 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+android/secrets.properties
+android/local.defaults.properties
+lib/generated/
+lib/generated/secrets.g.dart
 
 # Symbolication related
 app.*.symbols

@@ -22,7 +22,7 @@ class InfoPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [cs.surface, cs.surfaceVariant],
+            colors: [cs.surface, cs.surfaceContainerHighest],
           ),
         ),
         child: ListView(

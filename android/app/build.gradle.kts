@@ -1,9 +1,15 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
+
+apply(from = "generate_secrets.gradle.kts")
 
 android {
     namespace = "com.example.crunchy"
@@ -41,4 +47,13 @@ android {
 
 flutter {
     source = "../.."
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
+}
+
+tasks.named("preBuild") {
+    dependsOn("generateDartSecrets")
 }

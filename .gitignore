@@ -33,7 +33,6 @@ migrate_working_dir/
 /build/
 /coverage/
 android/secrets.properties
-android/local.defaults.properties
 lib/generated/
 lib/generated/secrets.g.dart
 

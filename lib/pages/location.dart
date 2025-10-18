@@ -21,10 +21,8 @@ class _LocationPageState extends State<LocationPage> {
   bool _loading = true;
   String? _error;
 
-  // API key generata via Gradle
   static const String _googleApiKey = AppSecrets.placesKey;
 
-  // Parametri Nearby Search (senza filtro testo lato server)
   static const int _radiusMeters = 5000;
   static const int _maxResults = 10;
 
@@ -42,8 +40,6 @@ class _LocationPageState extends State<LocationPage> {
       _initialCamera = null;
     });
 
-    debugPrint('🔑 API Key loaded: ${_googleApiKey.isEmpty ? "EMPTY" : "OK (${_googleApiKey.substring(0, 10)}...)"}');
-
     if (_googleApiKey.isEmpty) {
       setState(() {
         _error = 'Chiave Places assente';
@@ -54,8 +50,6 @@ class _LocationPageState extends State<LocationPage> {
 
     try {
       final hasPermission = await _ensureLocationPermission();
-      debugPrint('🛰️ Permission granted: $hasPermission');
-
       if (!hasPermission) {
         setState(() {
           _error = 'Permesso posizione negato';
@@ -64,15 +58,34 @@ class _LocationPageState extends State<LocationPage> {
         return;
       }
 
-      // In sviluppo puoi usare coordinate fisse. In produzione usa Geolocator.
-      const user = LatLng(41.576288, 14.674754);
-      debugPrint('📍 User coords: ${user.latitude}, ${user.longitude}');
+      // Posizione reale con timeout e fallback all’ultima posizione nota
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      ).timeout(
+        const Duration(seconds: 10),
+        onTimeout: () async {
+          final last = await Geolocator.getLastKnownPosition();
+          return last ??
+              Position(
+                latitude: 0,
+                longitude: 0,
+                timestamp: DateTime.now(),
+                accuracy: 0,
+                altitude: 0,
+                heading: 0,
+                speed: 0,
+                speedAccuracy: 0,
+                altitudeAccuracy: 0,
+                headingAccuracy: 0,
+              );
+        },
+      );
+
+      final user = LatLng(pos.latitude, pos.longitude);
 
       final result = await _searchNearby(user);
 
       final target = result.nearestMcDonalds ?? result.nearestAny ?? user;
-      debugPrint('🎯 Target coords: ${target.latitude}, ${target.longitude} '
-          '(mc=${result.nearestMcDonalds != null}, any=${result.nearestAny != null})');
 
       final markers = <Marker>{
         Marker(
@@ -105,10 +118,7 @@ class _LocationPageState extends State<LocationPage> {
       _controller?.animateCamera(
         CameraUpdate.newLatLngZoom(target, 13),
       );
-    } catch (e, st) {
-      debugPrint('❌ Init error: $e');
-      debugPrint('🧵 Stack: $st');
-
+    } catch (_) {
       setState(() {
         _error = 'Errore durante il caricamento';
         _loading = false;
@@ -118,14 +128,11 @@ class _LocationPageState extends State<LocationPage> {
 
   Future<bool> _ensureLocationPermission() async {
     final service = await Geolocator.isLocationServiceEnabled();
-    debugPrint('🔧 Location service enabled: $service');
     if (!service) return false;
 
     var perm = await Geolocator.checkPermission();
-    debugPrint('🔐 Permission status before: $perm');
     if (perm == LocationPermission.denied) {
       perm = await Geolocator.requestPermission();
-      debugPrint('🔐 Permission status after request: $perm');
     }
     if (perm == LocationPermission.deniedForever) {
       await openAppSettings();
@@ -135,8 +142,6 @@ class _LocationPageState extends State<LocationPage> {
         perm == LocationPermission.whileInUse;
   }
 
-  // Prima opzione: Nearby Search senza "query"/"keyword".
-  // Filtra "McDonald" lato client e, se non presente, usa il primo (già per distanza).
   Future<_NearbyResult> _searchNearby(LatLng user) async {
     final url = Uri.parse('https://places.googleapis.com/v1/places:searchNearby');
     final headers = {
@@ -156,19 +161,12 @@ class _LocationPageState extends State<LocationPage> {
       'rankPreference': 'DISTANCE',
     };
 
-    debugPrint('➡️ Nearby POST body: $body');
-
-    late http.Response res;
+    http.Response res;
     try {
       res = await http.post(url, headers: headers, body: jsonEncode(body));
-    } catch (e) {
-      debugPrint('🌐 HTTP error: $e');
+    } catch (_) {
       return const _NearbyResult();
     }
-
-    debugPrint('🌍 Nearby status=${res.statusCode}');
-    debugPrint('🌍 Nearby body=${res.body}');
-
     if (res.statusCode != 200) {
       return const _NearbyResult();
     }
@@ -176,24 +174,20 @@ class _LocationPageState extends State<LocationPage> {
     Map<String, dynamic> data;
     try {
       data = jsonDecode(res.body) as Map<String, dynamic>;
-    } catch (e) {
-      debugPrint('🧩 JSON parse error: $e');
+    } catch (_) {
       return const _NearbyResult();
     }
 
     final raw = (data['places'] as List?) ?? const [];
-    debugPrint('📦 Places count: ${raw.length}');
-
     final places = raw.cast<Map<String, dynamic>>();
 
     LatLng? nearestAny;
     if (places.isNotEmpty) {
-      final loc = places.first['location'];
+      final loc = places.first['location'] as Map<String, dynamic>;
       nearestAny = LatLng(
         (loc['latitude'] as num).toDouble(),
         (loc['longitude'] as num).toDouble(),
       );
-      debugPrint('🥇 Nearest ANY: ${nearestAny.latitude}, ${nearestAny.longitude}');
     }
 
     LatLng? nearestMc;
@@ -209,7 +203,6 @@ class _LocationPageState extends State<LocationPage> {
         break;
       }
     }
-
 
     return _NearbyResult(nearestAny: nearestAny, nearestMcDonalds: nearestMc);
   }

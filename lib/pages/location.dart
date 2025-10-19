@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -22,7 +23,6 @@ class _LocationPageState extends State<LocationPage> {
   String? _error;
 
   static const String _googleApiKey = AppSecrets.placesKey;
-
   static const int _radiusMeters = 5000;
   static const int _maxResults = 10;
 
@@ -52,13 +52,12 @@ class _LocationPageState extends State<LocationPage> {
       final hasPermission = await _ensureLocationPermission();
       if (!hasPermission) {
         setState(() {
-          _error = 'Permesso posizione negato';
           _loading = false;
+          _error = 'Permesso posizione negato';
         });
         return;
       }
 
-      // Posizione reale con timeout e fallback all’ultima posizione nota
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       ).timeout(
@@ -81,10 +80,9 @@ class _LocationPageState extends State<LocationPage> {
         },
       );
 
+
       final user = LatLng(pos.latitude, pos.longitude);
-
       final result = await _searchNearby(user);
-
       final target = result.nearestMcDonalds ?? result.nearestAny ?? user;
 
       final markers = <Marker>{
@@ -118,7 +116,7 @@ class _LocationPageState extends State<LocationPage> {
       _controller?.animateCamera(
         CameraUpdate.newLatLngZoom(target, 13),
       );
-    } catch (_) {
+    } catch (e) {
       setState(() {
         _error = 'Errore durante il caricamento';
         _loading = false;
@@ -161,50 +159,43 @@ class _LocationPageState extends State<LocationPage> {
       'rankPreference': 'DISTANCE',
     };
 
-    http.Response res;
     try {
-      res = await http.post(url, headers: headers, body: jsonEncode(body));
-    } catch (_) {
-      return const _NearbyResult();
-    }
-    if (res.statusCode != 200) {
-      return const _NearbyResult();
-    }
+      final res = await http.post(url, headers: headers, body: jsonEncode(body));
+      if (res.statusCode != 200) {
+        return const _NearbyResult();
+      }
 
-    Map<String, dynamic> data;
-    try {
-      data = jsonDecode(res.body) as Map<String, dynamic>;
-    } catch (_) {
-      return const _NearbyResult();
-    }
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final raw = (data['places'] as List?) ?? const [];
+      final places = raw.cast<Map<String, dynamic>>();
 
-    final raw = (data['places'] as List?) ?? const [];
-    final places = raw.cast<Map<String, dynamic>>();
-
-    LatLng? nearestAny;
-    if (places.isNotEmpty) {
-      final loc = places.first['location'] as Map<String, dynamic>;
-      nearestAny = LatLng(
-        (loc['latitude'] as num).toDouble(),
-        (loc['longitude'] as num).toDouble(),
-      );
-    }
-
-    LatLng? nearestMc;
-    for (final p in places) {
-      final dn = p['displayName'] as Map<String, dynamic>?;
-      final name = (dn?['text'] as String? ?? '').toLowerCase();
-      if (name.contains('mcdonald')) {
-        final loc = p['location'] as Map<String, dynamic>;
-        nearestMc = LatLng(
+      LatLng? nearestAny;
+      if (places.isNotEmpty) {
+        final loc = places.first['location'] as Map<String, dynamic>;
+        nearestAny = LatLng(
           (loc['latitude'] as num).toDouble(),
           (loc['longitude'] as num).toDouble(),
         );
-        break;
       }
-    }
 
-    return _NearbyResult(nearestAny: nearestAny, nearestMcDonalds: nearestMc);
+      LatLng? nearestMc;
+      for (final p in places) {
+        final dn = p['displayName'] as Map<String, dynamic>?;
+        final name = (dn?['text'] as String? ?? '').toLowerCase();
+        if (name.contains('mcdonald')) {
+          final loc = p['location'] as Map<String, dynamic>;
+          nearestMc = LatLng(
+            (loc['latitude'] as num).toDouble(),
+            (loc['longitude'] as num).toDouble(),
+          );
+          break;
+        }
+      }
+
+      return _NearbyResult(nearestAny: nearestAny, nearestMcDonalds: nearestMc);
+    } catch (_) {
+      return const _NearbyResult();
+    }
   }
 
   Future<void> _openDirections(LatLng target) async {
@@ -221,7 +212,7 @@ class _LocationPageState extends State<LocationPage> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-    if (_error != null) {
+    if (_error != null && _initialCamera == null) {
       return Scaffold(
         body: Center(
           child: Column(
@@ -247,6 +238,27 @@ class _LocationPageState extends State<LocationPage> {
                   markers: _markers,
                   onMapCreated: (c) => _controller = c,
                 ),
+                if (_error != null)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    top: 48,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.75),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
                 Positioned(
                   right: 16,
                   bottom: 24,

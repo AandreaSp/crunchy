@@ -48,7 +48,7 @@ class ReviewCard extends StatelessWidget {
 
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(imageAsset, height: 140, fit: BoxFit.cover),
+              child: Image.asset(imageAsset, height: 300, fit: BoxFit.cover),
             ),
             const SizedBox(height: 16),
 

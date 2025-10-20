@@ -160,6 +160,7 @@ class HomePage extends StatelessWidget {
                           Image.asset('asset/mappa/map.png', fit: BoxFit.cover),
                           DecoratedBox(
                             decoration: BoxDecoration(
+                              // Mantengo la tua API withValues
                               color: cs.surface.withValues(alpha: 0.25),
                             ),
                           ),
@@ -245,11 +246,11 @@ class HomePage extends StatelessWidget {
               ),
 
               // notizie
-              Padding(
+              const Padding(
                 padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
                 child: Text(
                   "Vuoi ingannare l'attesa?",
-                  style: Theme.of(context,).textTheme.titleMedium,
+                  // Lasciamo il default tipografico della pagina
                 ),
               ),
 
@@ -320,11 +321,11 @@ class HomePage extends StatelessWidget {
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
-                              boxShadow: [
+                              boxShadow: const [
                                 BoxShadow(
                                   color: Colors.black26,
                                   blurRadius: 6,
-                                  offset: const Offset(0, 4),
+                                  offset: Offset(0, 4),
                                 ),
                               ],
                             ),
@@ -394,10 +395,14 @@ class HomePage extends StatelessWidget {
                   final confirmed = await openReviewSheet(context);
                   if (confirmed == true && context.mounted) {
                     showDialog(
-                      context: context, 
-                      builder: (_) => const AlertDialog(
-                        title: Text('Grazie per averci scelto!'),
-                        content: Text('E grazie mille per la cortese disponibiltà'),
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        // Applichiamo lo stile del tema alla dialog
+                        titleTextStyle: Theme.of(ctx).textTheme.titleMedium,
+                        contentTextStyle: Theme.of(ctx).textTheme.bodyMedium,
+                        title: const Text('Grazie per averci scelto!'),
+                        content: const Text(
+                            'E grazie mille per la cortese disponibiltà'),
                       ),
                     );
                   }

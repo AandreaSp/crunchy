@@ -3,6 +3,7 @@ import 'package:crunchy/pages/menu_list.dart';
 import 'package:crunchy/widgets/review_card.dart';
 import 'package:crunchy/services/news_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:crunchy/widgets/review_sheet.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenMenu;
@@ -389,8 +390,17 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 20),
               ReviewCard(
                 imageAsset: 'asset/recensioni/recensione.png',
-                onPressed: () {
-                  // schermata recensioni
+                onPressed: () async {
+                  final confirmed = await openReviewSheet(context);
+                  if (confirmed == true && context.mounted) {
+                    showDialog(
+                      context: context, 
+                      builder: (_) => const AlertDialog(
+                        title: Text('Grazie per averci scelto!'),
+                        content: Text('E grazie mille per la cortese disponibiltà'),
+                      ),
+                    );
+                  }
                 },
               ),
 

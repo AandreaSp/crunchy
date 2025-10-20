@@ -80,42 +80,34 @@ class _LocationPageState extends State<LocationPage> {
         },
       );
 
-
       final user = LatLng(pos.latitude, pos.longitude);
-      final result = await _searchNearby(user);
-      final target = result.nearestMcDonalds ?? result.nearestAny ?? user;
+      final mc = await _searchMcDonalds(user);
+
+      if (mc == null) {
+        setState(() {
+          _initialCamera = CameraPosition(target: user, zoom: 13);
+          _markers = {};
+          _loading = false;
+          _error = 'Nessun McDonald’s trovato entro ${(_radiusMeters / 1000).toStringAsFixed(1)} km';
+        });
+        return;
+      }
 
       final markers = <Marker>{
         Marker(
-          markerId: const MarkerId('me'),
-          position: user,
-          infoWindow: const InfoWindow(title: 'La tua posizione'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueAzure,
-          ),
-        ),
-        Marker(
-          markerId: const MarkerId('my_restaurant'),
-          position: target,
-          infoWindow: InfoWindow(
-            title: result.nearestMcDonalds != null
-                ? "McDonald's più vicino"
-                : (result.nearestAny != null
-                    ? 'Ristorante più vicino'
-                    : 'Nessun ristorante trovato'),
-          ),
+          markerId: const MarkerId('mc'),
+          position: mc,
+          infoWindow: const InfoWindow(title: "McDonald's più vicino"),
         ),
       };
 
       setState(() {
         _markers = markers;
-        _initialCamera = CameraPosition(target: target, zoom: 13);
+        _initialCamera = CameraPosition(target: mc, zoom: 13);
         _loading = false;
       });
 
-      _controller?.animateCamera(
-        CameraUpdate.newLatLngZoom(target, 13),
-      );
+      _controller?.animateCamera(CameraUpdate.newLatLngZoom(mc, 13));
     } catch (e) {
       setState(() {
         _error = 'Errore durante il caricamento';
@@ -127,7 +119,6 @@ class _LocationPageState extends State<LocationPage> {
   Future<bool> _ensureLocationPermission() async {
     final service = await Geolocator.isLocationServiceEnabled();
     if (!service) return false;
-
     var perm = await Geolocator.checkPermission();
     if (perm == LocationPermission.denied) {
       perm = await Geolocator.requestPermission();
@@ -136,65 +127,42 @@ class _LocationPageState extends State<LocationPage> {
       await openAppSettings();
       return false;
     }
-    return perm == LocationPermission.always ||
-        perm == LocationPermission.whileInUse;
+    return perm == LocationPermission.always || perm == LocationPermission.whileInUse;
   }
 
-  Future<_NearbyResult> _searchNearby(LatLng user) async {
-    final url = Uri.parse('https://places.googleapis.com/v1/places:searchNearby');
+  Future<LatLng?> _searchMcDonalds(LatLng user) async {
+    final url = Uri.parse('https://places.googleapis.com/v1/places:searchText');
     final headers = {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': _googleApiKey,
       'X-Goog-FieldMask': 'places.location,places.displayName',
     };
     final body = {
-      'includedTypes': ['restaurant'],
+      'textQuery': "McDonald's",
       'maxResultCount': _maxResults,
-      'locationRestriction': {
+      'rankPreference': 'DISTANCE',
+      'locationBias': {
         'circle': {
           'center': {'latitude': user.latitude, 'longitude': user.longitude},
           'radius': _radiusMeters.toDouble(),
         },
       },
-      'rankPreference': 'DISTANCE',
     };
 
     try {
       final res = await http.post(url, headers: headers, body: jsonEncode(body));
-      if (res.statusCode != 200) {
-        return const _NearbyResult();
-      }
-
+      if (res.statusCode != 200) return null;
       final data = jsonDecode(res.body) as Map<String, dynamic>;
       final raw = (data['places'] as List?) ?? const [];
-      final places = raw.cast<Map<String, dynamic>>();
-
-      LatLng? nearestAny;
-      if (places.isNotEmpty) {
-        final loc = places.first['location'] as Map<String, dynamic>;
-        nearestAny = LatLng(
-          (loc['latitude'] as num).toDouble(),
-          (loc['longitude'] as num).toDouble(),
-        );
-      }
-
-      LatLng? nearestMc;
-      for (final p in places) {
-        final dn = p['displayName'] as Map<String, dynamic>?;
-        final name = (dn?['text'] as String? ?? '').toLowerCase();
-        if (name.contains('mcdonald')) {
-          final loc = p['location'] as Map<String, dynamic>;
-          nearestMc = LatLng(
-            (loc['latitude'] as num).toDouble(),
-            (loc['longitude'] as num).toDouble(),
-          );
-          break;
-        }
-      }
-
-      return _NearbyResult(nearestAny: nearestAny, nearestMcDonalds: nearestMc);
+      if (raw.isEmpty) return null;
+      final first = raw.first as Map<String, dynamic>;
+      final loc = first['location'] as Map<String, dynamic>;
+      return LatLng(
+        (loc['latitude'] as num).toDouble(),
+        (loc['longitude'] as num).toDouble(),
+      );
     } catch (_) {
-      return const _NearbyResult();
+      return null;
     }
   }
 
@@ -226,6 +194,7 @@ class _LocationPageState extends State<LocationPage> {
         ),
       );
     }
+    final hasMc = _markers.any((m) => m.markerId.value == 'mc');
     return Scaffold(
       body: _initialCamera == null
           ? const Center(child: Text('Nessuna posizione'))
@@ -233,7 +202,8 @@ class _LocationPageState extends State<LocationPage> {
               children: [
                 GoogleMap(
                   initialCameraPosition: _initialCamera!,
-                  myLocationEnabled: true,
+                  myLocationEnabled: false,
+                  myLocationButtonEnabled: false,
                   zoomControlsEnabled: false,
                   markers: _markers,
                   onMapCreated: (c) => _controller = c,
@@ -259,29 +229,21 @@ class _LocationPageState extends State<LocationPage> {
                       ),
                     ),
                   ),
-                Positioned(
-                  right: 16,
-                  bottom: 24,
-                  child: FloatingActionButton.extended(
-                    icon: const Icon(Icons.navigation),
-                    label: const Text('Indicazioni'),
-                    onPressed: () async {
-                      final m = _markers.firstWhere(
-                        (m) => m.markerId.value == 'my_restaurant',
-                        orElse: () => _markers.first,
-                      );
-                      await _openDirections(m.position);
-                    },
+                if (hasMc)
+                  Positioned(
+                    right: 16,
+                    bottom: 24,
+                    child: FloatingActionButton.extended(
+                      icon: const Icon(Icons.navigation),
+                      label: const Text('Indicazioni'),
+                      onPressed: () async {
+                        final m = _markers.firstWhere((m) => m.markerId.value == 'mc');
+                        await _openDirections(m.position);
+                      },
+                    ),
                   ),
-                ),
               ],
             ),
     );
   }
-}
-
-class _NearbyResult {
-  final LatLng? nearestAny;
-  final LatLng? nearestMcDonalds;
-  const _NearbyResult({this.nearestAny, this.nearestMcDonalds});
 }

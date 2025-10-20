@@ -34,14 +34,10 @@ class _NewsStripState extends State<NewsStrip> {
     } catch (e) {
       _error = e.toString();
     } finally {
-      setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
-  }
-
-  Future<void> _openUrl(String? url) async {
-    if (url == null) return;
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
   }
 
   @override
@@ -58,7 +54,6 @@ class _NewsStripState extends State<NewsStrip> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
         ),
-
         if (_loading)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
@@ -95,49 +90,69 @@ class _NewsStripState extends State<NewsStrip> {
               itemBuilder: (context, i) {
                 final a = _items[i];
                 final img = a['urlToImage'] as String?;
-                final source = a['source']?['name'] ?? '';
-                final published = (a['publishedAt'] as String?)
-                    ?.substring(0, 10)
-                    .replaceAll('-', ' ');
-                final label = published != null ? '$source • $published' : source;
+                final source = (a['source']?['name'] ?? '') as String;
+                final published =
+                    (a['publishedAt'] as String?)?.substring(0, 10).replaceAll('-', ' ');
+                final label =
+                    (published != null && published.isNotEmpty) ? '$source • $published' : source;
 
-                return GestureDetector(
-                  onTap: () => _openUrl(a['url'] as String?),
-                  child: Container(
-                    width: 300,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
+                return Container(
+                  width: 300,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(14),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
+                      onTap: () async {
+                        final raw = a['url'] as String?;
+                        final uri = raw != null ? Uri.tryParse(raw) : null;
+                        if (uri != null && await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                      },
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          if (img != null)
-                            Image.network(img, fit: BoxFit.cover)
+                          if (img != null && img.isNotEmpty)
+                            Image.network(
+                              img,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (ctx, child, evt) {
+                                if (evt == null) return child;
+                                return Container(color: cs.surfaceContainerHighest);
+                              },
+                              errorBuilder: (_, __, ___) =>
+                                  Container(color: cs.surfaceContainerHighest),
+                            )
                           else
-                            Container(color: cs.surfaceVariant),
+                            Container(color: cs.surfaceContainerHighest),
                           Container(color: Colors.black26),
                           Positioned(
                             top: 12,
                             left: 12,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.white70,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -150,7 +165,7 @@ class _NewsStripState extends State<NewsStrip> {
                             left: 12,
                             right: 12,
                             child: Text(
-                              a['title'] ?? '',
+                              (a['title'] ?? '') as String,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -169,7 +184,6 @@ class _NewsStripState extends State<NewsStrip> {
               },
             ),
           ),
-
         const SizedBox(height: 100),
       ],
     );

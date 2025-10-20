@@ -246,11 +246,11 @@ class HomePage extends StatelessWidget {
               ),
 
               // notizie
-              const Padding(
+              Padding(
                 padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
                 child: Text(
                   "Vuoi ingannare l'attesa?",
-                  // Lasciamo il default tipografico della pagina
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
 

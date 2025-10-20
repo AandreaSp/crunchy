@@ -396,10 +396,9 @@ class HomePage extends StatelessWidget {
                   if (confirmed == true && context.mounted) {
                     showDialog(
                       context: context,
-                      builder: (ctx) => AlertDialog(
-                        // Applichiamo lo stile del tema alla dialog
-                        titleTextStyle: Theme.of(ctx).textTheme.titleMedium,
-                        contentTextStyle: Theme.of(ctx).textTheme.bodyMedium,
+                      builder: (context) => AlertDialog(
+                        titleTextStyle: Theme.of(context).textTheme.titleMedium,
+                        contentTextStyle: Theme.of(context).textTheme.bodyMedium,
                         title: const Text('Grazie per averci scelto!'),
                         content: const Text(
                             'E grazie mille per la cortese disponibiltà'),

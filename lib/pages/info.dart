@@ -48,14 +48,13 @@ class InfoPage extends StatelessWidget {
                           const SizedBox(height: 8),
                           Table(
                             columnWidths: const {
-                              0: IntrinsicColumnWidth(), // occupano “quanto basta” in base al contenuto (giorni)
-                              1: FlexColumnWidth(), // prende spazio rimanente (orari)
+                              0: IntrinsicColumnWidth(),
+                              1: FlexColumnWidth(),
                             },
                             defaultVerticalAlignment:
                                 TableCellVerticalAlignment.middle,
                             children: [
-                              for (final h in hours)
-                                _hoursRow(tt, h.day, h.time),
+                              for (final h in hours) _hoursRow(tt, h.day, h.time),
                             ],
                           ),
                         ],

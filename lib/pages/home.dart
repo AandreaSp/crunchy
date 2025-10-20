@@ -4,6 +4,7 @@ import 'package:crunchy/widgets/review_card.dart';
 import 'package:crunchy/services/news_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:crunchy/widgets/review_sheet.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenMenu;
@@ -44,7 +45,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
-              // Menù
+              // Menù + Vedi tutto
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -56,91 +57,22 @@ class HomePage extends StatelessWidget {
                     ),
                     TextButton.icon(
                       onPressed: onOpenMenu,
-                      icon: const Icon(Icons.menu),
+                      icon: const Icon(Icons.menu, size: 18),
                       label: Text(
                         'Vedi tutto',
                         style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
-              // Categorie
-              SizedBox(
-                height: 80,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: categories.length + 1,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, i) {
-                    if (i == categories.length) {
-                      return Material(
-                        color: const Color.fromARGB(255, 255, 239, 214),
-                        borderRadius: BorderRadius.circular(14),
-                        child: InkWell(
-                          onTap: onOpenMenu,
-                          borderRadius: BorderRadius.circular(14),
-                          child: const SizedBox(
-                            width: 56,
-                            height: 56,
-                            child: Icon(
-                              Icons.chevron_right,
-                              color: Color.fromARGB(255, 91, 61, 63),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    final c = categories[i];
-                    const bg = Color.fromARGB(255, 255, 239, 214);
-                    return Material(
-                      color: bg,
-                      borderRadius: BorderRadius.circular(14),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => MenuListPage(
-                                category: c.name.toLowerCase(),
-                                title: c.name,
-                              ),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(14),
-                        child: SizedBox(
-                          width: 160,
-                          height: 56,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 12),
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundColor: bg,
-                                backgroundImage: AssetImage(c.imagePath),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  c.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.titleSmall,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
+              // Categorie — Hero Carousel
+              const _MenuHeroCarousel(),
               const SizedBox(height: 10),
 
               // anteprima gps
@@ -160,7 +92,6 @@ class HomePage extends StatelessWidget {
                           Image.asset('asset/mappa/map.png', fit: BoxFit.cover),
                           DecoratedBox(
                             decoration: BoxDecoration(
-                              // Mantengo la tua API withValues
                               color: cs.surface.withValues(alpha: 0.25),
                             ),
                           ),
@@ -197,20 +128,13 @@ class HomePage extends StatelessWidget {
                                   bottom: Radius.circular(16),
                                 ),
                               ),
-                              padding: const EdgeInsets.fromLTRB(
-                                16,
-                                12,
-                                16,
-                                12,
-                              ),
+                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                               child: Row(
                                 children: [
                                   Expanded(
                                     child: Text(
                                       'Trova ristorante',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium,
+                                      style: Theme.of(context).textTheme.titleMedium,
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -227,9 +151,7 @@ class HomePage extends StatelessWidget {
                                         ),
                                         child: Text(
                                           'vicino a te',
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.titleMedium,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                       ),
                                     ),
@@ -247,7 +169,7 @@ class HomePage extends StatelessWidget {
 
               // notizie
               Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
                 child: Text(
                   "Vuoi ingannare l'attesa?",
                   style: Theme.of(context).textTheme.titleMedium,
@@ -265,10 +187,7 @@ class HomePage extends StatelessWidget {
                   }
                   if (snapshot.hasError) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: Row(
                         children: [
                           const Icon(Icons.error_outline, color: Colors.red),
@@ -280,8 +199,7 @@ class HomePage extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            onPressed: () =>
-                                (context as Element).markNeedsBuild(),
+                            onPressed: () => (context as Element).markNeedsBuild(),
                             icon: const Icon(Icons.refresh),
                           ),
                         ],
@@ -291,10 +209,7 @@ class HomePage extends StatelessWidget {
                   final articles = snapshot.data!;
                   if (articles.isEmpty) {
                     return const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: Text('Nessuna notizia disponibile.'),
                     );
                   }
@@ -400,8 +315,7 @@ class HomePage extends StatelessWidget {
                         titleTextStyle: Theme.of(context).textTheme.titleMedium,
                         contentTextStyle: Theme.of(context).textTheme.bodyMedium,
                         title: const Text('Grazie per averci scelto!'),
-                        content: const Text(
-                            'E grazie mille per la cortese disponibiltà'),
+                        content: const Text('E grazie mille per la cortese disponibiltà'),
                       ),
                     );
                   }
@@ -417,7 +331,134 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// Modello categorie
+/* -------------------- WIDGET: Menu Hero Carousel -------------------- */
+
+class _MenuHeroCarousel extends StatefulWidget {
+  const _MenuHeroCarousel();
+
+  @override
+  State<_MenuHeroCarousel> createState() => _MenuHeroCarouselState();
+}
+
+class _MenuHeroCarouselState extends State<_MenuHeroCarousel> {
+  final CarouselSliderController _controller = CarouselSliderController();
+  int _current = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        CarouselSlider.builder(
+          carouselController: _controller,
+          itemCount: categories.length,
+          itemBuilder: (context, i, _) {
+            final c = categories[i];
+            return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => MenuListPage(
+                      category: c.name.toLowerCase(),
+                      title: c.name,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(c.imagePath, fit: BoxFit.cover),
+
+                      // pannello chiaro a destra (effetto "vetrina")
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Container(
+                          width: 170,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerRight,
+                              end: Alignment.centerLeft,
+                              colors: [
+                                cs.surface.withValues(alpha: 0.95),
+                                cs.surface.withValues(alpha: 0.65),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // titolo con stile titleSmall
+                      Positioned(
+                        right: 18,
+                        top: 18,
+                        child: Text(
+                          c.name,
+                          textAlign: TextAlign.right,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: cs.onSurface,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          options: CarouselOptions(
+            height: 190,
+            viewportFraction: 0.9,
+            enlargeCenterPage: true,
+            enlargeFactor: 0.18,
+            enableInfiniteScroll: false,
+            padEnds: false,
+            onPageChanged: (index, reason) => setState(() => _current = index),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // puntini indicator
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(categories.length, (i) {
+            final selected = i == _current;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              height: 6,
+              width: selected ? 18 : 6,
+              decoration: BoxDecoration(
+                color: selected ? cs.primary : cs.primary.withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(999),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+/* -------------------- Modello categorie -------------------- */
+
 class FoodCategory {
   final String name;
   final String imagePath;
@@ -425,7 +466,7 @@ class FoodCategory {
 }
 
 const categories = <FoodCategory>[
-  FoodCategory('Panini', 'asset/menu/panini/menu_panini.jpg'),
-  FoodCategory('Fritti', 'asset/menu/fritti/menu_fritti.jpg'),
-  FoodCategory('Carne', 'asset/menu/carne/menu_carne.jpg'),
+  FoodCategory("Panini", 'asset/menu/panini/crunchy.png'),
+  FoodCategory("Carne", 'asset/menu/carne/fiorentina.png'),
+  FoodCategory("Dolci", 'asset/menu/dolci/tiramisu.png'),
 ];

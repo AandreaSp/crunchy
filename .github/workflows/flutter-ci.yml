@@ -43,15 +43,15 @@ jobs:
         run: flutter analyze
 
       - name: Run unit & widget tests
-        run: flutter test --dart-define=CI=true
+        run: flutter test --dart-define=CI=true --dart-define=NEWS_API_KEY=DUMMY
 
       - name: Run integration tests (flutter-tester)
         run: |
           set -euxo pipefail
           if [ -d "integration_test" ]; then
-            flutter test integration_test -d flutter-tester --dart-define=CI=true
+            flutter test integration_test -d flutter-tester --dart-define=CI=true --dart-define=NEWS_API_KEY=DUMMY
           elif [ -d "test/integration_test" ]; then
-            flutter test test/integration_test -d flutter-tester --dart-define=CI=true
+            flutter test test/integration_test -d flutter-tester --dart-define=CI=true --dart-define=NEWS_API_KEY=DUMMY
           else
             echo "No integration tests directory found; skipping integration tests."
           fi

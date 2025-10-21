@@ -6,7 +6,7 @@ import 'package:crunchy/services/news_cache.dart';
 
 class NewsService {
   static final _apiKey = AppSecrets.newsKey;
-  static const _endpoint =
+  static final _endpoint =
       'https://newsapi.org/v2/everything'
       '?q=cibo%20OR%20ristorazione'
       '&language=it'

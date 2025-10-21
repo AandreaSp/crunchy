@@ -70,7 +70,7 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Categorie — Carousel (1 elemento per volta)
+              // Categorie — Carousel
               const MenuCarousel(),
               const SizedBox(height: 10),
 

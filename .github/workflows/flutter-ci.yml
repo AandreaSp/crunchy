@@ -2,9 +2,7 @@ name: Flutter CI
 
 on:
   push:
-    branches: [ main, Branch2 ]
-  pull_request:
-    branches: [ main, Branch2 ]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -34,7 +32,6 @@ jobs:
         with:
           channel: stable
           cache: true
-          # flutter-version: '3.x.y'   # opzionale: blocca una versione specifica
 
       - name: Flutter version
         run: flutter --version
@@ -72,7 +69,6 @@ jobs:
           name: coverage-lcov
           path: coverage/lcov.info
 
-  # (Opzionale) build Android di debug: salta automaticamente se manca android/
   build-android:
     name: Build Android (debug)
     runs-on: ubuntu-latest

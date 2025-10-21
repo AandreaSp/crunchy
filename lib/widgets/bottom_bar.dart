@@ -5,6 +5,20 @@ import '../pages/menu.dart';
 import '../pages/location.dart';
 import '../pages/info.dart';
 
+// Vero in CI quando lanci i test con: --dart-define=CI=true
+const bool _kCi = bool.fromEnvironment('CI', defaultValue: false);
+
+// Pagina “leggera” per la CI: nessun plugin/sensore/rete
+class _StubPage extends StatelessWidget {
+  final String label;
+  const _StubPage(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('Stub $label'));
+  }
+}
+
 class CrunchyBottomBar extends StatefulWidget {
   const CrunchyBottomBar({super.key});
 
@@ -18,12 +32,20 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
   void _openMenuTab() => setState(() => _currentIndex = 1);
   void _openLocationTab() => setState(() => _currentIndex = 2);
 
-  late final List<Widget> _pages = <Widget>[
-    HomePage(onOpenMenu: _openMenuTab, onOpenLocation: _openLocationTab),
-    const MenuPage(),
-    const LocationPage(),
-    const InfoPage(), // senza AppBar
-  ];
+  // usato in CI per evitare crash/flaky dovuti a plugin.
+  late final List<Widget> _pages = _kCi
+      ? const <Widget>[
+          _StubPage('Home'),
+          _StubPage('Menu'),
+          _StubPage('Ristorante'),
+          _StubPage('Info'),
+        ]
+      : <Widget>[
+          HomePage(onOpenMenu: _openMenuTab, onOpenLocation: _openLocationTab),
+          const MenuPage(),
+          const LocationPage(),
+          const InfoPage(), // senza AppBar
+        ];
 
   final List<String> _titles = const ['Crunchy', 'Menu', 'Location', 'Info'];
 

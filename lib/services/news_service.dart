@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:crunchy/generated/secrets.g.dart';
+import 'package:crunchy/services/app_secrets.dart';
 import 'package:crunchy/services/news_cache.dart';
 
 class NewsService {
-  static const _apiKey = AppSecrets.newsKey;
+  static final _apiKey = AppSecrets.newsKey;
   static const _endpoint =
       'https://newsapi.org/v2/everything'
       '?q=cibo%20OR%20ristorazione'

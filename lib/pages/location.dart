@@ -7,8 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
-
-import 'package:crunchy/generated/secrets.g.dart';
+import 'package:crunchy/services/app_secrets.dart';
 import 'package:crunchy/services/location_persistence.dart';
 
 class LocationPage extends StatefulWidget {
@@ -30,7 +29,7 @@ class _LocationPageState extends State<LocationPage> {
   bool _restoredFromCache = false;
 
   // Config
-  static const String _googleApiKey = AppSecrets.placesKey;
+  static final String _googleApiKey = AppSecrets.placesKey;
   static const int _radiusMeters = 5000;
   static const int _maxResults = 10;
 

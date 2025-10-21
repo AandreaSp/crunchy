@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:crunchy/generated/secrets.g.dart';
 import 'package:crunchy/services/news_cache.dart';
@@ -11,8 +12,13 @@ class NewsService {
       '&language=it'
       '&apiKey=$_apiKey';
 
-  // Cache riutilizzabile
-  static const NewsCache _cache = NewsCache();
+  // Iniezione per i test
+  final http.Client _client;
+  final NewsCache _cache;
+
+  NewsService({http.Client? client, NewsCache? cache})
+      : _client = client ?? http.Client(),
+        _cache = cache ?? const NewsCache();
 
   Future<List<Map<String, dynamic>>> fetchNews({bool allowCache = true}) async {
     // 1) Cache-first
@@ -27,7 +33,7 @@ class NewsService {
     }
 
     final uri = Uri.parse(_endpoint);
-    final res = await http.get(uri).timeout(const Duration(seconds: 8));
+    final res = await _client.get(uri).timeout(const Duration(seconds: 8));
 
     if (res.statusCode != 200) {
       throw Exception('Status ${res.statusCode}');

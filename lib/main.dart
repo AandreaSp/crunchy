@@ -10,6 +10,7 @@ class CrunchyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'Ristorante Crunchy',
       theme: AppTheme.app, 
       home: const CrunchyBottomBar()
     );

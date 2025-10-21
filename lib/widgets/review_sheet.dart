@@ -30,7 +30,6 @@ class _ReviewSheetState extends State<_ReviewSheet> {
   @override
   void initState() {
     super.initState();
-    // Rende reattivo il bottone "Conferma" quando cambia il testo
     _text.addListener(() => setState(() {}));
   }
 
@@ -147,7 +146,6 @@ class _ReviewSheetState extends State<_ReviewSheet> {
 
           const SizedBox(height: 10),
 
-          // Galleria selezionata (orizzontale, con X per rimuovere)
           if (_photos.isNotEmpty)
             SizedBox(
               height: 110,

@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+
 import 'package:crunchy/generated/secrets.g.dart';
+import 'package:crunchy/services/location_persistence.dart';
 
 class LocationPage extends StatefulWidget {
   const LocationPage({super.key});
@@ -22,6 +25,11 @@ class _LocationPageState extends State<LocationPage> {
   bool _loading = true;
   String? _error;
 
+  // Persistenza
+  final LocationPersistence _persist = const LocationPersistence();
+  bool _restoredFromCache = false;
+
+  // Config
   static const String _googleApiKey = AppSecrets.placesKey;
   static const int _radiusMeters = 5000;
   static const int _maxResults = 10;
@@ -29,15 +37,41 @@ class _LocationPageState extends State<LocationPage> {
   @override
   void initState() {
     super.initState();
-    _initFlow();
+    _boot();
+  }
+
+  Future<void> _boot() async {
+    await _restoreLastResult();
+    await _initFlow();
+  }
+
+  Future<void> _restoreLastResult() async {
+    try {
+      final (lat, lng) = await _persist.loadLastLatLng();
+      if (lat != null && lng != null) {
+        final savedTarget = LatLng(lat, lng);
+        setState(() {
+          _restoredFromCache = true;
+          _initialCamera = CameraPosition(target: savedTarget, zoom: 13);
+          _markers = {
+            Marker(
+              markerId: const MarkerId('mc'),
+              position: savedTarget,
+              infoWindow: const InfoWindow(title: "McDonald's (ultimo risultato)"),
+            ),
+          };
+          _loading = false;
+          _error = null;
+        });
+      }
+    } catch (_) {
+    }
   }
 
   Future<void> _initFlow() async {
     setState(() {
       _loading = true;
       _error = null;
-      _markers = {};
-      _initialCamera = null;
     });
 
     if (_googleApiKey.isEmpty) {
@@ -53,7 +87,7 @@ class _LocationPageState extends State<LocationPage> {
       if (!hasPermission) {
         setState(() {
           _loading = false;
-          _error = 'Permesso posizione negato';
+          _error = 'Permesso posizione negato o servizi disattivati';
         });
         return;
       }
@@ -85,8 +119,7 @@ class _LocationPageState extends State<LocationPage> {
 
       if (mc == null) {
         setState(() {
-          _initialCamera = CameraPosition(target: user, zoom: 13);
-          _markers = {};
+          _initialCamera ??= CameraPosition(target: user, zoom: 13);
           _loading = false;
           _error = 'Nessun McDonald’s trovato entro ${(_radiusMeters / 1000).toStringAsFixed(1)} km';
         });
@@ -101,10 +134,14 @@ class _LocationPageState extends State<LocationPage> {
         ),
       };
 
+      await _persist.saveLastLatLng(mc.latitude, mc.longitude);
+
       setState(() {
         _markers = markers;
         _initialCamera = CameraPosition(target: mc, zoom: 13);
         _loading = false;
+        _error = null;
+        _restoredFromCache = false; // ora abbiamo un risultato fresco
       });
 
       _controller?.animateCamera(CameraUpdate.newLatLngZoom(mc, 13));
@@ -119,6 +156,7 @@ class _LocationPageState extends State<LocationPage> {
   Future<bool> _ensureLocationPermission() async {
     final service = await Geolocator.isLocationServiceEnabled();
     if (!service) return false;
+
     var perm = await Geolocator.checkPermission();
     if (perm == LocationPermission.denied) {
       perm = await Geolocator.requestPermission();
@@ -175,75 +213,128 @@ class _LocationPageState extends State<LocationPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-    if (_error != null && _initialCamera == null) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(_error!),
-              const SizedBox(height: 12),
-              FilledButton(onPressed: _initFlow, child: const Text('Riprova')),
-            ],
-          ),
-        ),
-      );
-    }
     final hasMc = _markers.any((m) => m.markerId.value == 'mc');
+
     return Scaffold(
-      body: _initialCamera == null
-          ? const Center(child: Text('Nessuna posizione'))
-          : Stack(
-              children: [
-                GoogleMap(
-                  initialCameraPosition: _initialCamera!,
-                  myLocationEnabled: false,
-                  myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
-                  markers: _markers,
-                  onMapCreated: (c) => _controller = c,
+      body: Stack(
+        children: [
+          if (_initialCamera != null)
+            GoogleMap(
+              initialCameraPosition: _initialCamera!,
+              myLocationEnabled: false,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              markers: _markers,
+              onMapCreated: (c) => _controller = c,
+            )
+          else if (_loading)
+            const Center(child: CircularProgressIndicator())
+          else
+            const Center(child: Text('Nessuna posizione')),
+
+          if (_error != null)
+            Positioned(
+              left: 16,
+              right: 16,
+              top: 48,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                if (_error != null)
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    top: 48,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.75),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(color: Colors.white),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (hasMc)
-                  Positioned(
-                    right: 16,
-                    bottom: 24,
-                    child: FloatingActionButton.extended(
-                      icon: const Icon(Icons.navigation),
-                      label: const Text('Indicazioni'),
-                      onPressed: () async {
-                        final m = _markers.firstWhere((m) => m.markerId.value == 'mc');
-                        await _openDirections(m.position);
-                      },
-                    ),
-                  ),
-              ],
+              ),
             ),
+
+          if (_loading && _initialCamera != null)
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+
+          if (_restoredFromCache && !_loading && hasMc)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 104,
+              child: _InfoPill(
+                text:
+                    'Mostrando ultimo risultato salvato. Tocca “Aggiorna” per ricalcolare da posizione attuale.',
+              ),
+            ),
+
+          if (hasMc)
+            Positioned(
+              right: 16,
+              bottom: 24,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: FloatingActionButton.extended(
+                      heroTag: 'refresh',
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Aggiorna'),
+                      onPressed: _initFlow,
+                    ),
+                  ),
+                  FloatingActionButton.extended(
+                    heroTag: 'directions',
+                    icon: const Icon(Icons.navigation),
+                    label: const Text('Indicazioni'),
+                    onPressed: () async {
+                      final m = _markers.firstWhere((m) => m.markerId.value == 'mc');
+                      await _openDirections(m.position);
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+          if (!hasMc && !_loading)
+            Positioned(
+              right: 16,
+              bottom: 24,
+              child: FloatingActionButton.extended(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Riprova'),
+                onPressed: _initFlow,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  final String text;
+  const _InfoPill({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12),
+      color: Colors.black.withValues(alpha: 0.75),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

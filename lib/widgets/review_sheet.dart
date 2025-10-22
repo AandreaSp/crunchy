@@ -9,6 +9,7 @@ Future<bool?> openReviewSheet(BuildContext context) {
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     showDragHandle: true,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -17,8 +18,10 @@ Future<bool?> openReviewSheet(BuildContext context) {
   );
 }
 
+/* ---- Widget interno della sheet ---- */
 class _ReviewSheet extends StatefulWidget {
   const _ReviewSheet();
+
   @override
   State<_ReviewSheet> createState() => _ReviewSheetState();
 }
@@ -42,7 +45,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
     super.dispose();
   }
 
-  /* ---- Scatta una foto dalla fotocamera e aggiunge alla lista ---- */
+  /* ---- Scatta una foto e la aggiunge alla lista ---- */
   Future<void> _takePhoto() async {
     try {
       final pic = await _picker.pickImage(
@@ -81,159 +84,166 @@ class _ReviewSheetState extends State<_ReviewSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final insets = MediaQuery.of(context).viewInsets.bottom;
-    final cs = Theme.of(context).colorScheme;
+    /* ---- Padding extra solo per la tastiera ---- */
+    final keyboard = MediaQuery.of(context).viewInsets.bottom;
 
-    /* ---- Contenuto del foglio: titolo, input testo con azioni foto, anteprime e pulsanti ---- */
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + insets),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          /* ---- Intestazione con titolo e chiusura ---- */
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Lascia una recensione',
-                  style: TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ),
-              IconButton(
-                onPressed: () => Navigator.pop(context, false),
-                icon: const Icon(Icons.close),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-
-          /* ---- Campo testo con menu rapido per aggiungere foto (camera/galleria) ---- */
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              TextField(
-                controller: _text,
-                maxLines: 4,
-                maxLength: 280,
-                decoration: InputDecoration(
-                  hintText: 'Scrivi una recensione...',
-                  counterText: '',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+    /* ---- Contenuto del foglio con SafeArea per stare sopra alla gesture bar ---- */
+    return SafeArea(
+      top: false,
+      bottom: true,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + keyboard),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            /* ---- Intestazione con titolo e chiusura ---- */
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Lascia una recensione',
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  contentPadding: const EdgeInsets.fromLTRB(12, 12, 56, 12),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: PopupMenuButton<String>(
-                  tooltip: 'Aggiungi foto',
-                  icon: const Icon(Icons.add_a_photo),
-                  onSelected: (v) {
-                    if (v == 'camera') _takePhoto();
-                    if (v == 'gallery') _pickFromGallery();
-                  },
-                  itemBuilder: (ctx) => const [
-                    PopupMenuItem(
-                      value: 'camera',
-                      child: ListTile(
-                        leading: Icon(Icons.photo_camera),
-                        title: Text('Scatta foto'),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'gallery',
-                      child: ListTile(
-                        leading: Icon(Icons.photo_library),
-                        title: Text('Seleziona dalla galleria'),
-                      ),
-                    ),
-                  ],
+                IconButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  icon: const Icon(Icons.close),
+                  tooltip: 'Chiudi',
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+            const SizedBox(height: 8),
 
-          const SizedBox(height: 10),
-
-          /* ---- Lista orizzontale delle foto selezionate con tasto di rimozione ---- */
-          if (_photos.isNotEmpty)
-            SizedBox(
-              height: 110,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _photos.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, i) {
-                  final file = File(_photos[i].path);
-                  return Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(
-                          file,
-                          width: 150,
-                          height: 110,
-                          fit: BoxFit.cover,
+            /* ---- Campo testo con menu rapido per aggiungere foto (camera/galleria) ---- */
+            Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                TextField(
+                  controller: _text,
+                  maxLines: 4,
+                  maxLength: 280,
+                  decoration: InputDecoration(
+                    hintText: 'Scrivi una recensione...',
+                    counterText: '',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.fromLTRB(12, 12, 56, 12),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: PopupMenuButton<String>(
+                    tooltip: 'Aggiungi foto',
+                    icon: const Icon(Icons.add_a_photo),
+                    onSelected: (v) {
+                      if (v == 'camera') _takePhoto();
+                      if (v == 'gallery') _pickFromGallery();
+                    },
+                    itemBuilder: (ctx) => const [
+                      PopupMenuItem<String>(
+                        value: 'camera',
+                        child: ListTile(
+                          leading: Icon(Icons.photo_camera),
+                          title: Text('Scatta una foto'),
                         ),
                       ),
-                      Positioned(
-                        right: 4,
-                        top: 4,
-                        child: InkWell(
-                          onTap: () => _removePhotoAt(i),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: cs.surface.withValues(alpha: 0.85),
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            child: const Icon(Icons.close, size: 16),
-                          ),
+                      PopupMenuItem<String>(
+                        value: 'gallery',
+                        child: ListTile(
+                          leading: Icon(Icons.photo_library),
+                          title: Text('Seleziona dalla galleria'),
                         ),
                       ),
                     ],
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
 
-          const SizedBox(height: 14),
+            const SizedBox(height: 10),
 
-          /* ---- Pulsanti di azione: annulla e conferma (con loader durante l’invio) ---- */
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton(
-                  style: ButtonStyle(
-                    backgroundColor: const WidgetStatePropertyAll(Colors.white),
-                    foregroundColor: WidgetStatePropertyAll(
-                      Theme.of(context).colorScheme.onSurface,
+            /* ---- Lista orizzontale delle foto selezionate con tasto di rimozione ---- */
+            if (_photos.isNotEmpty)
+              SizedBox(
+                height: 110,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _photos.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, i) {
+                    final file = File(_photos[i].path);
+                    return Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            file,
+                            width: 140,
+                            height: 110,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          right: 4,
+                          top: 4,
+                          child: InkWell(
+                            onTap: () => _removePhotoAt(i),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.all(4),
+                              child: const Icon(Icons.close,
+                                  size: 16, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+
+            const SizedBox(height: 14),
+
+            /* ---- Pulsanti di azione: annulla e conferma (con loader durante l’invio) ---- */
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          const WidgetStatePropertyAll(Colors.white),
+                      foregroundColor: WidgetStatePropertyAll(
+                        Theme.of(context).colorScheme.onSurface,
+                      ),
+                      overlayColor: WidgetStatePropertyAll(
+                        Colors.black.withValues(alpha: 0.05),
+                      ),
                     ),
-                    overlayColor: WidgetStatePropertyAll(
-                      Colors.black.withValues(alpha: 0.05),
-                    ),
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Annulla'),
                   ),
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Annulla'),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _canConfirm ? _confirm : null,
-                  child: _sending
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Conferma'),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _canConfirm ? _confirm : null,
+                    child: _sending
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Conferma'),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

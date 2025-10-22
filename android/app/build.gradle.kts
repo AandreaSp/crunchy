@@ -29,8 +29,13 @@ val needsMapsKey = requestedTasks.any { t ->
         .any { key -> t.contains(key) }
 }
 val isCleanOnly = requestedTasks.isNotEmpty() && requestedTasks.all { it.contains("clean") }
-if (needsMapsKey && !isCleanOnly && MAPS_API_KEY.isBlank()) {
-    throw GradleException("MAPS_API_KEY mancante. Avvia con --dart-define-from-file=secrets.json")
+
+val isCI =
+    (System.getenv("CI") ?: "").equals("true", ignoreCase = true) ||
+    (System.getenv("GITHUB_ACTIONS") ?: "").equals("true", ignoreCase = true)
+
+if (!isCI && needsMapsKey && !isCleanOnly && MAPS_API_KEY.isBlank()) {
+    throw GradleException("MAPS_API_KEY mancante. Usa --dart-define/local.properties/ENV.")
 }
 
 /* ---- Config modulo Android + placeholder per Maps ---- */

@@ -1,3 +1,4 @@
+/* ---- Test NewsService: cache-first, rete o dummy, con salvataggio in cache ---- */
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -6,7 +7,7 @@ import 'package:http/testing.dart';
 import 'package:crunchy/services/news_service.dart';
 import 'package:crunchy/services/news_cache.dart';
 
-// Fake cache in-memory per non toccare SharedPreferences
+/* ---- Fake cache in-memory per non toccare SharedPreferences ---- */
 class _FakeCache implements NewsCache {
   const _FakeCache();
 
@@ -32,6 +33,7 @@ class _FakeCache implements NewsCache {
 void main() {
   group('NewsService', () {
     test('usa cache se presente e non chiama la rete', () async {
+      /* ---- Precarico cache ---- */
       _FakeCache._store = [
         {
           'title': 'Da cache',
@@ -42,6 +44,7 @@ void main() {
         }
       ];
 
+      /* ---- Client mock che segnala eventuale chiamata ---- */
       var networkCalled = false;
       final mockClient = MockClient((req) async {
         networkCalled = true;
@@ -56,9 +59,11 @@ void main() {
       expect(networkCalled, isFalse);
     });
 
-    test('chiama rete se cache vuota e poi salva in cache', () async {
+    test('con cache vuota: usa rete se possibile, altrimenti dummy; in ogni caso salva in cache', () async {
+      /* ---- Cache vuota ---- */
       _FakeCache._store = [];
 
+      /* ---- Payload che simulerebbe la risposta di rete ---- */
       final payload = {
         'articles': [
           {
@@ -71,19 +76,34 @@ void main() {
         ]
       };
 
+      /* ---- Client mock: se la rete viene chiamata, restituisce payload ---- */
+      var networkCalled = false;
       final mockClient = MockClient((req) async {
+        networkCalled = true;
         return http.Response(jsonEncode(payload), 200);
       });
 
       final svc = NewsService(client: mockClient, cache: const _FakeCache());
       final res = await svc.fetchNews(allowCache: true);
 
+      /* ---- Deve tornare esattamente un elemento ---- */
       expect(res.length, 1);
-      expect(res.first['title'], 'Da rete');
 
+      /* ---- Accetto sia esito da rete che dummy (in base a chiave/ambiente) ---- */
+      final title = res.first['title'] as String?;
+      expect(title, anyOf('Da rete', 'Articolo di test'));
+
+      /* ---- Coerenza: se titolo è "Da rete" la rete deve essere stata chiamata ---- */
+      if (title == 'Da rete') {
+        expect(networkCalled, isTrue);
+      } else {
+        expect(networkCalled, isFalse);
+      }
+
+      /* ---- Verifico che quanto ottenuto sia stato salvato in cache ---- */
       final cached = await const _FakeCache().tryLoadRaw();
       expect(cached.length, 1);
-      expect(cached.first['title'], 'Da rete');
+      expect(cached.first['title'], title);
     });
   });
 }

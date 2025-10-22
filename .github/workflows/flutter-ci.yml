@@ -60,7 +60,7 @@ jobs:
         if: always()
         run: |
           rm -rf coverage
-          flutter test --coverage --coverage-path=coverage/lcov.info || true
+          flutter test --dart-define=CI=true --dart-define=NEWS_API_KEY=DUMMY --coverage --coverage-path=coverage/lcov.info || true
 
       - name: Upload coverage artifact
         if: always()

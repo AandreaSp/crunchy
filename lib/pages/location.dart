@@ -28,7 +28,6 @@ class _LocationPageState extends State<LocationPage> {
 
   /* ---- Persistenza: ultimo risultato memorizzato ---- */
   final LocationPersistence _persist = const LocationPersistence();
-  bool _restoredFromCache = false;
 
   /* ---- Configurazione API e ricerca ---- */
   static final String _googleApiKey = AppSecrets.placesKey;
@@ -54,7 +53,6 @@ class _LocationPageState extends State<LocationPage> {
       if (lat != null && lng != null) {
         final savedTarget = LatLng(lat, lng);
         setState(() {
-          _restoredFromCache = true;
           _initialCamera = CameraPosition(target: savedTarget, zoom: 13);
           _markers = {
             Marker(
@@ -145,7 +143,6 @@ class _LocationPageState extends State<LocationPage> {
         _initialCamera = CameraPosition(target: mc, zoom: 13);
         _loading = false;
         _error = null;
-        _restoredFromCache = false; 
       });
 
       _controller?.animateCamera(CameraUpdate.newLatLngZoom(mc, 13));
@@ -269,17 +266,6 @@ class _LocationPageState extends State<LocationPage> {
               ),
             ),
 
-          if (_restoredFromCache && !_loading && hasMc)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 104,
-              child: _InfoPill(
-                text:
-                    'Mostrando ultimo risultato salvato. Tocca “Aggiorna” per ricalcolare da posizione attuale.',
-              ),
-            ),
-
           if (hasMc)
             Positioned(
               right: 16,
@@ -320,29 +306,6 @@ class _LocationPageState extends State<LocationPage> {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-/* ---- Pillola informativa sovrapposta con testo breve ---- */
-class _InfoPill extends StatelessWidget {
-  final String text;
-  const _InfoPill({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(12),
-      color: Colors.black.withValues(alpha: 0.75),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
       ),
     );
   }

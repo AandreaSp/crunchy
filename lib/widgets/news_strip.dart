@@ -1,95 +1,219 @@
-/* ---- Strip orizzontale "Ultime notizie": carica da NewsService e mostra cards tappabili con immagine e titolo ---- */
+/* ---- Strip "Ultime notizie" con gestione robusta di offline/errore ---- */
 import 'package:flutter/material.dart';
-import 'package:crunchy/services/news_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:crunchy/services/news_service.dart';
 
+/* ---- Callback per refresh esterni ---- */
 typedef RefreshCallback = Future<void> Function();
 
+/* ---- Widget per la sezione notizie ---- */
 class NewsStrip extends StatefulWidget {
-  final RefreshCallback onRefresh;
-  const NewsStrip({super.key, required this.onRefresh});
+  final RefreshCallback? onRefresh; 
+  const NewsStrip({super.key, this.onRefresh});
 
   @override
   State<NewsStrip> createState() => _NewsStripState();
 }
 
+/* ---- Stato interno: caricamento, errore, lista articoli ---- */
 class _NewsStripState extends State<NewsStrip> {
-  /* ---- Service + stato locale di caricamento/errore/lista ---- */
+  /* ---- Service + stato locale ---- */
   final _service = NewsService();
   bool _loading = true;
-  String _error = '';
-  List<Map<String, dynamic>> _items = [];
+  bool _hasError = false;
+  List<Map<String, dynamic>> _items = const [];
 
+  /* ---- Avvio: forza rete per evitare cache quando offline ---- */
   @override
   void initState() {
     super.initState();
-    _load();
+    _load(forceNetwork: true);
   }
 
-  /* ---- Carica le notizie: reset stato, gestisce eccezioni e aggiorna UI se montato ---- */
-  Future<void> _load() async {
+  /* ---- Caricamento notizie ---- */
+  Future<void> _load({bool forceNetwork = true}) async {
     setState(() {
       _loading = true;
-      _error = '';
+      _hasError = false;
     });
+
     try {
-      _items = await _service.fetchNews();
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      if (mounted) {
-        setState(() => _loading = false);
+      final items = await _service.fetchNews(allowCache: !forceNetwork);
+      if (!mounted) return;
+
+      setState(() {
+        _items = items;
+        _hasError = items.isEmpty; 
+        _loading = false;
+      });
+
+      if (items.isNotEmpty && widget.onRefresh != null) {
+        await widget.onRefresh!.call();
       }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _hasError = true;   
+        _loading = false;
+        _items = const [];
+      });
     }
   }
 
+  /* ---- Card di stato "nessuna notizia" con tasto refresh ---- */
+  Widget _emptyState(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      height: 110,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.event_note, size: 28, color: cs.onSurfaceVariant),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Nessuna notizia disponibile al momento.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+          IconButton(
+            tooltip: 'Aggiorna',
+            onPressed: () => _load(forceNetwork: true),
+            icon: Icon(Icons.refresh, color: cs.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /* ---- Card singola di notizia ---- */
+  Widget _newsCard(BuildContext context, Map<String, dynamic> a) {
+    final cs = Theme.of(context).colorScheme;
+    final img = a['urlToImage'] as String?;
+    final source = (a['source']?['name'] ?? '') as String;
+    final published =
+        (a['publishedAt'] as String?)?.substring(0, 10).replaceAll('-', ' ');
+    final label =
+        (published != null && published.isNotEmpty) ? '$source • $published' : source;
+
+    return Container(
+      width: 300,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () async {
+          final raw = a['url'] as String?;
+          final uri = raw != null ? Uri.tryParse(raw) : null;
+          if (uri != null && await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            /* ---- Immagine con fallback ---- */
+            if (img != null && img.isNotEmpty)
+              Image.network(
+                img,
+                fit: BoxFit.cover,
+                loadingBuilder: (ctx, child, evt) {
+                  if (evt == null) return child;
+                  return Container(color: cs.surfaceContainerHighest);
+                },
+                errorBuilder: (_, __, ___) =>
+                    Container(color: cs.surfaceContainerHighest),
+              )
+            else
+              Container(color: cs.surfaceContainerHighest),
+
+            /* ---- Overlay scuro per contrasto del testo ---- */
+            Container(color: Colors.black26),
+
+            /* ---- Badge sorgente/data ---- */
+            Positioned(
+              top: 12,
+              left: 12,
+              right: 12,
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white70,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ),
+
+            /* ---- Titolo della notizia ---- */
+            Positioned(
+              bottom: 16,
+              left: 12,
+              right: 12,
+              child: Text(
+                (a['title'] ?? '') as String,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  height: 1.2,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /* ---- Build: titolo, loading, stato vuoto/errore, lista orizzontale ---- */
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
 
-    /* ---- Colonna: titolo sezione + stato (loading/errore/lista orizzontale) ---- */
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         /* ---- Intestazione sezione ---- */
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 22, 16, 10),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 22, 16, 10),
           child: Text(
-            'Ultime notizie',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            "Vuoi ingannare l'attesa?",
+            style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
         ),
 
-        /* ---- Stato: spinner durante il caricamento ---- */
+        /* ---- Stato: caricamento ---- */
         if (_loading)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Center(child: CircularProgressIndicator()),
           )
 
-        /* ---- Stato: riga di errore con retry ---- */
-        else if (_error.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Errore notizie: $_error',
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-                IconButton(
-                  onPressed: _load,
-                  icon: const Icon(Icons.refresh),
-                ),
-              ],
-            ),
-          )
+        /* ---- Stato: errore o nessun contenuto ---- */
+        else if (_hasError)
+          _emptyState(context)
 
-        /* ---- Stato: lista orizzontale di articoli (card tappabili con immagine + overlay) ---- */
+        /* ---- Stato: contenuti disponibili ---- */
         else
           SizedBox(
             height: 210,
@@ -98,114 +222,12 @@ class _NewsStripState extends State<NewsStrip> {
               scrollDirection: Axis.horizontal,
               itemCount: _items.length,
               separatorBuilder: (_, __) => const SizedBox(width: 14),
-              itemBuilder: (context, i) {
-                final a = _items[i];
-                final img = a['urlToImage'] as String?;
-                final source = (a['source']?['name'] ?? '') as String;
-                final published =
-                    (a['publishedAt'] as String?)?.substring(0, 10).replaceAll('-', ' ');
-                final label =
-                    (published != null && published.isNotEmpty) ? '$source • $published' : source;
-
-                /* ---- Card singola: immagine (con placeholder/error), badge sorgente/data, titolo e tap per aprire il link ---- */
-                return Container(
-                  width: 300,
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.15),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(14),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(14),
-                      onTap: () async {
-                        final raw = a['url'] as String?;
-                        final uri = raw != null ? Uri.tryParse(raw) : null;
-                        if (uri != null && await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
-                        }
-                      },
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          /* ---- Background immagine con placeholder e fallback ---- */
-                          if (img != null && img.isNotEmpty)
-                            Image.network(
-                              img,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (ctx, child, evt) {
-                                if (evt == null) return child;
-                                return Container(color: cs.surfaceContainerHighest);
-                              },
-                              errorBuilder: (_, __, ___) =>
-                                  Container(color: cs.surfaceContainerHighest),
-                            )
-                          else
-                            Container(color: cs.surfaceContainerHighest),
-
-                          /* ---- Velo scuro per aumentare il contrasto del testo ---- */
-                          Container(color: Colors.black26),
-
-                          /* ---- Etichetta sorgente/data in alto a sinistra ---- */
-                          Positioned(
-                            top: 12,
-                            left: 12,
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white70,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                label,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          /* ---- Titolo in basso su due righe con ellissi ---- */
-                          Positioned(
-                            bottom: 16,
-                            left: 12,
-                            right: 12,
-                            child: Text(
-                              (a['title'] ?? '') as String,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                height: 1.2,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+              itemBuilder: (context, i) => _newsCard(context, _items[i]),
             ),
           ),
 
-        /* ---- Spaziatura extra sotto la strip ---- */
-        const SizedBox(height: 100),
+        /* ---- Spaziatura finale ---- */
+        const SizedBox(height: 10),
       ],
     );
   }

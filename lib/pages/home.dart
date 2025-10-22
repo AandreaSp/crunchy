@@ -1,10 +1,9 @@
 /* ---- Home: logo, carosello menù, anteprima mappa, notizie e recensioni ---- */
 import 'package:flutter/material.dart';
 import 'package:crunchy/widgets/review_card.dart';
-import 'package:crunchy/services/news_service.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:crunchy/widgets/review_sheet.dart';
 import 'package:crunchy/widgets/menu_carousel.dart';
+import 'package:crunchy/widgets/news_strip.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenMenu;
@@ -15,13 +14,6 @@ class HomePage extends StatelessWidget {
     required this.onOpenMenu,
     required this.onOpenLocation,
   });
-
-  /* ---- Apre un URL esterno se valido ---- */
-  Future<void> _openUrl(String? url) async {
-    if (url == null) return;
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +63,7 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              
 
               /* ---- Carosello categorie menù ---- */
               const MenuCarousel(),
@@ -130,16 +122,22 @@ class HomePage extends StatelessWidget {
                                   bottom: Radius.circular(16),
                                 ),
                               ),
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                12,
+                                16,
+                                12,
+                              ),
                               child: Row(
                                 children: [
                                   Expanded(
                                     child: Text(
                                       'Trova ristorante',
-                                      style: Theme.of(context).textTheme.titleMedium,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
                                   Material(
                                     color: cs.primaryContainer,
                                     borderRadius: BorderRadius.circular(999),
@@ -153,7 +151,9 @@ class HomePage extends StatelessWidget {
                                         ),
                                         child: Text(
                                           'vicino a te',
-                                          style: Theme.of(context).textTheme.titleMedium,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.titleMedium,
                                         ),
                                       ),
                                     ),
@@ -169,146 +169,11 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
-              /* ---- Sezione notizie: titolo + lista orizzontale via FutureBuilder ---- */
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
-                child: Text(
-                  "Vuoi ingannare l'attesa?",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-
-              /* ---- Caricamento notizie asincrono con gestione loading/errore/empty ---- */
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: NewsService().fetchNews(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.error_outline, color: Colors.red),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Errore notizie: ${snapshot.error}',
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => (context as Element).markNeedsBuild(),
-                            icon: const Icon(Icons.refresh),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  final articles = snapshot.data!;
-                  if (articles.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Text('Nessuna notizia disponibile.'),
-                    );
-                  }
-
-                  /* ---- Lista orizzontale di card notizia (immagine + sorgente/data + titolo) ---- */
-                  return SizedBox(
-                    height: 210,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: articles.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 16),
-                      itemBuilder: (context, i) {
-                        final a = articles[i];
-                        final img = a['urlToImage'] as String?;
-                        final source = a['source']?['name'] ?? '';
-                        final date = (a['publishedAt'] as String?)
-                            ?.substring(0, 10)
-                            .replaceAll('-', ' ');
-                        final label = date != null ? '$source • $date' : source;
-
-                        return GestureDetector(
-                          onTap: () => _openUrl(a['url'] as String?),
-                          child: Container(
-                            width: 300,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(14),
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  if (img != null)
-                                    Image.network(img, fit: BoxFit.cover)
-                                  else
-                                    Container(color: cs.surfaceContainerHighest),
-                                  Container(color: Colors.black26),
-                                  Positioned(
-                                    top: 12,
-                                    left: 12,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white70,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        label,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 16,
-                                    left: 12,
-                                    right: 12,
-                                    child: Text(
-                                      a['title'] ?? '',
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                        height: 1.2,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
+              /* ---- Widget notizie ---- */
+              const NewsStrip(),
 
               /* ---- Card recensioni con bottom sheet per lasciare feedback ---- */
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               ReviewCard(
                 imageAsset: 'asset/recensioni/recensione.png',
                 onPressed: () async {
@@ -320,7 +185,9 @@ class HomePage extends StatelessWidget {
                         titleTextStyle: Theme.of(context).textTheme.titleMedium,
                         contentTextStyle: Theme.of(context).textTheme.bodyMedium,
                         title: const Text('Grazie per averci scelto!'),
-                        content: const Text('E grazie mille per la cortese disponibiltà'),
+                        content: const Text(
+                          'E grazie mille per la cortese disponibiltà',
+                        ),
                       ),
                     );
                   }

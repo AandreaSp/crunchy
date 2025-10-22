@@ -1,3 +1,4 @@
+/* ---- Carosello di categorie con immagini: tap su una card -> apre la lista della categoria corrispondente ---- */
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:crunchy/pages/menu_list.dart';
@@ -10,6 +11,7 @@ class MenuCarousel extends StatefulWidget {
 }
 
 class _MenuCarouselState extends State<MenuCarousel> {
+  /* ---- Stato del carosello: controller per scorrere e indice pagina corrente ---- */
   final CarouselSliderController _controller = CarouselSliderController();
   int _current = 0;
 
@@ -17,9 +19,11 @@ class _MenuCarouselState extends State<MenuCarousel> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
+    /* ---- Layout verticale: carosello a tutta larghezza + indicatori di pagina ---- */
     return Column(
       children: [
-       Padding(
+        /* ---- Carosello: card con immagine di sfondo, pannello/gradiente a destra e titolo; tap -> navigazione a MenuListPage ---- */
+        Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CarouselSlider.builder(
             carouselController: _controller,
@@ -46,7 +50,7 @@ class _MenuCarouselState extends State<MenuCarousel> {
                       children: [
                         Image.asset(c.imagePath, fit: BoxFit.cover),
 
-                        // pannello chiaro a destra (effetto "vetrina")
+                        /* ---- Pannello “vetrina” con gradiente sul lato destro per migliorare la leggibilità del titolo ---- */
                         Align(
                           alignment: Alignment.centerRight,
                           child: Container(
@@ -65,14 +69,15 @@ class _MenuCarouselState extends State<MenuCarousel> {
                           ),
                         ),
 
-                        // titolo
+                        /* ---- Titolo della categoria in alto a destra ---- */
                         Positioned(
                           right: 18,
                           top: 18,
                           child: Text(
                             c.name,
                             textAlign: TextAlign.right,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: cs.onSurface,
                                 ),
@@ -84,20 +89,22 @@ class _MenuCarouselState extends State<MenuCarousel> {
                 ),
               );
             },
+            /* ---- Opzioni del carosello: scorrimento a pagina intera, senza loop; aggiorna l’indicatore all’evento di cambio pagina ---- */
             options: CarouselOptions(
               height: 190,
-              viewportFraction: 1.0,   
+              viewportFraction: 1.0,
               enlargeCenterPage: false,
               enableInfiniteScroll: false,
               padEnds: false,
               pageSnapping: true,
-              onPageChanged: (index, reason) => setState(() => _current = index),
+              onPageChanged: (index, reason) =>
+                  setState(() => _current = index),
             ),
           ),
         ),
         const SizedBox(height: 10),
 
-        // indicatori
+        /* ---- Indicatori animati dello stato del carosello (pallini) ---- */
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(_categories.length, (i) {
@@ -108,7 +115,9 @@ class _MenuCarouselState extends State<MenuCarousel> {
               height: 6,
               width: selected ? 18 : 6,
               decoration: BoxDecoration(
-                color: selected ? cs.primary : cs.primary.withValues(alpha: 0.35),
+                color: selected
+                    ? cs.primary
+                    : cs.primary.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(999),
               ),
             );
@@ -119,13 +128,14 @@ class _MenuCarouselState extends State<MenuCarousel> {
   }
 }
 
-/* ---- Modello + dati interni  ---- */
+/* ---- Modello dati interno per rappresentare la categoria del menù ---- */
 class _FoodCategory {
   final String name;
   final String imagePath;
   const _FoodCategory(this.name, this.imagePath);
 }
 
+/* ---- Dataset locale delle categorie mostrate nel carosello ---- */
 const _categories = <_FoodCategory>[
   _FoodCategory("Panini", 'asset/menu/panini/crunchy.png'),
   _FoodCategory("Carne", 'asset/menu/carne/fiorentina.png'),

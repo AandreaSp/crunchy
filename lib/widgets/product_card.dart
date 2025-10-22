@@ -1,16 +1,18 @@
+/* ---- Card prodotto con immagine, titolo, prezzo e descrizione opzionale (posizionabile) ---- */
 import 'package:flutter/material.dart';
 import 'euro_price.dart';
 
+/* ---- Posizionamento della descrizione: nessuna/sotto titolo/sotto prezzo ---- */
 enum DescriptionPlacement { none, underTitle, underPrice }
 
 class ProductCard extends StatelessWidget {
   final String imageAsset;
   final String title;
   final double price;
-  final String? description; 
+  final String? description;
   final VoidCallback? onTap;
   final double aspectRatio;
-  final DescriptionPlacement placement; 
+  final DescriptionPlacement placement;
 
   const ProductCard({
     super.key,
@@ -28,7 +30,7 @@ class ProductCard extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final hasDesc = description != null && description!.trim().isNotEmpty;
 
-    // Eventuale descrizione sotto il titolo
+    /* ---- Blocco titolo: mostra eventuale descrizione sotto il titolo ---- */
     Widget buildTitleBlock() {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +54,7 @@ class ProductCard extends StatelessWidget {
       );
     }
 
-    // Eventuale descrizione sotto il prezzo
+    /* ---- Blocco prezzo: EuroPrice + eventuale descrizione sotto il prezzo ---- */
     Widget buildPriceBlock() {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -71,6 +73,7 @@ class ProductCard extends StatelessWidget {
       );
     }
 
+    /* ---- Contenuto principale della card: immagine in alto + riga titolo/prezzo ---- */
     final core = Ink(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -86,6 +89,7 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          /* ---- Immagine ritagliata con aspect ratio configurabile ---- */
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: AspectRatio(
@@ -93,6 +97,7 @@ class ProductCard extends StatelessWidget {
               child: Image.asset(imageAsset, fit: BoxFit.cover),
             ),
           ),
+          /* ---- Riga con titolo (a sinistra) e prezzo (a destra) ---- */
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
             child: Row(
@@ -108,6 +113,7 @@ class ProductCard extends StatelessWidget {
       ),
     );
 
+    /* ---- Se c'è onTap, avvolgo con InkWell per effetto ripple e interazione ---- */
     if (onTap == null) return core;
 
     return InkWell(

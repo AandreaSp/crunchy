@@ -1,8 +1,10 @@
+/* ---- Bottom sheet per inserire una recensione con testo e foto (camera/galleria), con conferma e annulla ---- */
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 
+/* ---- Mostra il foglio modale e restituisce true/false a seconda della conferma ---- */
 Future<bool?> openReviewSheet(BuildContext context) {
   return showModalBottomSheet<bool>(
     context: context,
@@ -22,6 +24,7 @@ class _ReviewSheet extends StatefulWidget {
 }
 
 class _ReviewSheetState extends State<_ReviewSheet> {
+  /* ---- Controller testo, picker immagini e stato locale (foto selezionate / invio in corso) ---- */
   final _text = TextEditingController();
   final _picker = ImagePicker();
   final List<XFile> _photos = [];
@@ -39,6 +42,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
     super.dispose();
   }
 
+  /* ---- Scatta una foto dalla fotocamera e aggiunge alla lista ---- */
   Future<void> _takePhoto() async {
     try {
       final pic = await _picker.pickImage(
@@ -49,6 +53,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
     } on PlatformException catch (_) {}
   }
 
+  /* ---- Seleziona più foto dalla galleria e le aggiunge alla lista ---- */
   Future<void> _pickFromGallery() async {
     try {
       final pics = await _picker.pickMultiImage(maxWidth: 1600);
@@ -56,10 +61,12 @@ class _ReviewSheetState extends State<_ReviewSheet> {
     } on PlatformException catch (_) {}
   }
 
+  /* ---- Rimuove una foto dall’anteprima ---- */
   void _removePhotoAt(int index) {
     setState(() => _photos.removeAt(index));
   }
 
+  /* ---- Conferma: finto invio, feedback aptico e chiusura con risultato true ---- */
   Future<void> _confirm() async {
     setState(() => _sending = true);
     await Future.delayed(const Duration(milliseconds: 600));
@@ -68,6 +75,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
     Navigator.of(context).pop(true);
   }
 
+  /* ---- Abilita il pulsante di conferma solo se c’è testo o almeno una foto e non sto inviando ---- */
   bool get _canConfirm =>
       !_sending && (_text.text.trim().isNotEmpty || _photos.isNotEmpty);
 
@@ -76,11 +84,13 @@ class _ReviewSheetState extends State<_ReviewSheet> {
     final insets = MediaQuery.of(context).viewInsets.bottom;
     final cs = Theme.of(context).colorScheme;
 
+    /* ---- Contenuto del foglio: titolo, input testo con azioni foto, anteprime e pulsanti ---- */
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + insets),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          /* ---- Intestazione con titolo e chiusura ---- */
           Row(
             children: [
               const Expanded(
@@ -97,7 +107,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
           ),
           const SizedBox(height: 8),
 
-          // Testo + azioni foto
+          /* ---- Campo testo con menu rapido per aggiungere foto (camera/galleria) ---- */
           Stack(
             alignment: Alignment.bottomRight,
             children: [
@@ -146,6 +156,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
 
           const SizedBox(height: 10),
 
+          /* ---- Lista orizzontale delle foto selezionate con tasto di rimozione ---- */
           if (_photos.isNotEmpty)
             SizedBox(
               height: 110,
@@ -189,6 +200,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
 
           const SizedBox(height: 14),
 
+          /* ---- Pulsanti di azione: annulla e conferma (con loader durante l’invio) ---- */
           Row(
             children: [
               Expanded(

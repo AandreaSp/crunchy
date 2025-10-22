@@ -1,3 +1,4 @@
+/* ---- Home: logo, carosello menù, anteprima mappa, notizie e recensioni ---- */
 import 'package:flutter/material.dart';
 import 'package:crunchy/widgets/review_card.dart';
 import 'package:crunchy/services/news_service.dart';
@@ -15,6 +16,7 @@ class HomePage extends StatelessWidget {
     required this.onOpenLocation,
   });
 
+  /* ---- Apre un URL esterno se valido ---- */
   Future<void> _openUrl(String? url) async {
     if (url == null) return;
     final uri = Uri.parse(url);
@@ -25,13 +27,14 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
+    /* ---- Scaffold con scroll: blocchi verticali (logo, menù, mappa, notizie, recensioni) ---- */
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo
+              /* ---- Logo in alto ---- */
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: ClipRRect(
@@ -44,7 +47,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
-              // Menù + Vedi tutto
+              /* ---- Intestazione sezione Menù + azione "Vedi tutto" ---- */
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -70,11 +73,11 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Categorie — Carousel
+              /* ---- Carosello categorie menù ---- */
               const MenuCarousel(),
               const SizedBox(height: 10),
 
-              // anteprima gps
+              /* ---- Anteprima con pulsante per aprire la sezione GPS ---- */
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Material(
@@ -127,20 +130,13 @@ class HomePage extends StatelessWidget {
                                   bottom: Radius.circular(16),
                                 ),
                               ),
-                              padding: const EdgeInsets.fromLTRB(
-                                16,
-                                12,
-                                16,
-                                12,
-                              ),
+                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                               child: Row(
                                 children: [
                                   Expanded(
                                     child: Text(
                                       'Trova ristorante',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium,
+                                      style: Theme.of(context).textTheme.titleMedium,
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -157,9 +153,7 @@ class HomePage extends StatelessWidget {
                                         ),
                                         child: Text(
                                           'vicino a te',
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.titleMedium,
+                                          style: Theme.of(context).textTheme.titleMedium,
                                         ),
                                       ),
                                     ),
@@ -175,7 +169,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
-              // notizie
+              /* ---- Sezione notizie: titolo + lista orizzontale via FutureBuilder ---- */
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
                 child: Text(
@@ -184,6 +178,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
+              /* ---- Caricamento notizie asincrono con gestione loading/errore/empty ---- */
               FutureBuilder<List<Map<String, dynamic>>>(
                 future: NewsService().fetchNews(),
                 builder: (context, snapshot) {
@@ -195,10 +190,7 @@ class HomePage extends StatelessWidget {
                   }
                   if (snapshot.hasError) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: Row(
                         children: [
                           const Icon(Icons.error_outline, color: Colors.red),
@@ -210,8 +202,7 @@ class HomePage extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            onPressed: () =>
-                                (context as Element).markNeedsBuild(),
+                            onPressed: () => (context as Element).markNeedsBuild(),
                             icon: const Icon(Icons.refresh),
                           ),
                         ],
@@ -221,13 +212,12 @@ class HomePage extends StatelessWidget {
                   final articles = snapshot.data!;
                   if (articles.isEmpty) {
                     return const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: Text('Nessuna notizia disponibile.'),
                     );
                   }
+
+                  /* ---- Lista orizzontale di card notizia (immagine + sorgente/data + titolo) ---- */
                   return SizedBox(
                     height: 210,
                     child: ListView.separated(
@@ -267,9 +257,7 @@ class HomePage extends StatelessWidget {
                                   if (img != null)
                                     Image.network(img, fit: BoxFit.cover)
                                   else
-                                    Container(
-                                      color: cs.surfaceContainerHighest,
-                                    ),
+                                    Container(color: cs.surfaceContainerHighest),
                                   Container(color: Colors.black26),
                                   Positioned(
                                     top: 12,
@@ -319,7 +307,7 @@ class HomePage extends StatelessWidget {
                 },
               ),
 
-              // Recensioni
+              /* ---- Card recensioni con bottom sheet per lasciare feedback ---- */
               const SizedBox(height: 20),
               ReviewCard(
                 imageAsset: 'asset/recensioni/recensione.png',
@@ -330,19 +318,16 @@ class HomePage extends StatelessWidget {
                       context: context,
                       builder: (context) => AlertDialog(
                         titleTextStyle: Theme.of(context).textTheme.titleMedium,
-                        contentTextStyle: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium,
+                        contentTextStyle: Theme.of(context).textTheme.bodyMedium,
                         title: const Text('Grazie per averci scelto!'),
-                        content: const Text(
-                          'E grazie mille per la cortese disponibiltà',
-                        ),
+                        content: const Text('E grazie mille per la cortese disponibiltà'),
                       ),
                     );
                   }
                 },
               ),
 
+              /* ---- Spaziatura finale ---- */
               const SizedBox(height: 10),
             ],
           ),

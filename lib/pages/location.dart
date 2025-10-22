@@ -1,3 +1,4 @@
+/* ---- Mappa: trova il ristorante (McDonald's) più vicino (Google Places), salva ultimo risultato e gestisce permessi/errore ---- */
 import 'dart:async';
 import 'dart:convert';
 
@@ -18,17 +19,18 @@ class LocationPage extends StatefulWidget {
 }
 
 class _LocationPageState extends State<LocationPage> {
+  /* ---- Stato mappa + caricamento/errore ---- */
   GoogleMapController? _controller;
   CameraPosition? _initialCamera;
   Set<Marker> _markers = {};
   bool _loading = true;
   String? _error;
 
-  // Persistenza
+  /* ---- Persistenza: ultimo risultato memorizzato ---- */
   final LocationPersistence _persist = const LocationPersistence();
   bool _restoredFromCache = false;
 
-  // Config
+  /* ---- Configurazione API e ricerca ---- */
   static final String _googleApiKey = AppSecrets.placesKey;
   static const int _radiusMeters = 5000;
   static const int _maxResults = 10;
@@ -39,11 +41,13 @@ class _LocationPageState extends State<LocationPage> {
     _boot();
   }
 
+  /* ---- Avvio: ripristino cache e poi avvio il flusso di localizzazione/ricerca ---- */
   Future<void> _boot() async {
     await _restoreLastResult();
     await _initFlow();
   }
 
+  /* ---- Ripristina ultimo Mc salvato e prepara camera/marker ---- */
   Future<void> _restoreLastResult() async {
     try {
       final (lat, lng) = await _persist.loadLastLatLng();
@@ -67,6 +71,7 @@ class _LocationPageState extends State<LocationPage> {
     }
   }
 
+  /* ---- Flusso principale: verifica chiave, permessi, posizione; chiama Places e aggiorna UI ---- */
   Future<void> _initFlow() async {
     setState(() {
       _loading = true;
@@ -140,7 +145,7 @@ class _LocationPageState extends State<LocationPage> {
         _initialCamera = CameraPosition(target: mc, zoom: 13);
         _loading = false;
         _error = null;
-        _restoredFromCache = false; // ora abbiamo un risultato fresco
+        _restoredFromCache = false; 
       });
 
       _controller?.animateCamera(CameraUpdate.newLatLngZoom(mc, 13));
@@ -152,6 +157,7 @@ class _LocationPageState extends State<LocationPage> {
     }
   }
 
+  /* ---- Permessi posizione: verifica servizi, richiede permesso e apre impostazioni se necessario ---- */
   Future<bool> _ensureLocationPermission() async {
     final service = await Geolocator.isLocationServiceEnabled();
     if (!service) return false;
@@ -167,6 +173,7 @@ class _LocationPageState extends State<LocationPage> {
     return perm == LocationPermission.always || perm == LocationPermission.whileInUse;
   }
 
+  /* ---- Chiamata REST a Places (searchText) con bias circolare, restituisce LatLng del primo risultato ---- */
   Future<LatLng?> _searchMcDonalds(LatLng user) async {
     final url = Uri.parse('https://places.googleapis.com/v1/places:searchText');
     final headers = {
@@ -203,6 +210,7 @@ class _LocationPageState extends State<LocationPage> {
     }
   }
 
+  /* ---- Apre Google Maps con le indicazioni verso la destinazione ---- */
   Future<void> _openDirections(LatLng target) async {
     final uri = Uri.parse(
       'https://www.google.com/maps/dir/?api=1&destination=${target.latitude},${target.longitude}&travelmode=driving',
@@ -212,6 +220,7 @@ class _LocationPageState extends State<LocationPage> {
 
   @override
   Widget build(BuildContext context) {
+    /* ---- UI: mappa + overlay (errore, loader, pill informativa) e FAB azioni ---- */
     final hasMc = _markers.any((m) => m.markerId.value == 'mc');
 
     return Scaffold(
@@ -316,6 +325,7 @@ class _LocationPageState extends State<LocationPage> {
   }
 }
 
+/* ---- Pillola informativa sovrapposta con testo breve ---- */
 class _InfoPill extends StatelessWidget {
   final String text;
   const _InfoPill({required this.text});

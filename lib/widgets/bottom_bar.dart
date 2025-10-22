@@ -1,23 +1,10 @@
+/* ---- Bottom bar con 4 tab: gestione indice corrente, titolo dinamico e dialog di uscita su richiesta ---- */
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // per SystemNavigator.pop()
+import 'package:flutter/services.dart';
 import '../pages/home.dart';
 import '../pages/menu.dart';
 import '../pages/location.dart';
 import '../pages/info.dart';
-
-// Vero in CI quando lanci i test con: --dart-define=CI=true
-const bool _kCi = bool.fromEnvironment('CI', defaultValue: false);
-
-// Pagina “leggera” per la CI: nessun plugin/sensore/rete
-class _StubPage extends StatelessWidget {
-  final String label;
-  const _StubPage(this.label);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Stub $label'));
-  }
-}
 
 class CrunchyBottomBar extends StatefulWidget {
   const CrunchyBottomBar({super.key});
@@ -27,28 +14,25 @@ class CrunchyBottomBar extends StatefulWidget {
 }
 
 class _CrunchyShellState extends State<CrunchyBottomBar> {
+  /* ---- Indice della tab corrente ---- */
   int _currentIndex = 0;
 
+  /* ---- Callback per aprire rapidamente le tab interne dalla Home ---- */
   void _openMenuTab() => setState(() => _currentIndex = 1);
   void _openLocationTab() => setState(() => _currentIndex = 2);
 
-  // usato in CI per evitare crash/flaky dovuti a plugin.
-  late final List<Widget> _pages = _kCi
-      ? const <Widget>[
-          _StubPage('Home'),
-          _StubPage('Menu'),
-          _StubPage('Ristorante'),
-          _StubPage('Info'),
-        ]
-      : <Widget>[
-          HomePage(onOpenMenu: _openMenuTab, onOpenLocation: _openLocationTab),
-          const MenuPage(),
-          const LocationPage(),
-          const InfoPage(), // senza AppBar
-        ];
+  /* ---- Pagine associate alle voci della bottom bar ---- */
+  late final List<Widget> _pages = <Widget>[
+    HomePage(onOpenMenu: _openMenuTab, onOpenLocation: _openLocationTab),
+    const MenuPage(),
+    const LocationPage(),
+    const InfoPage(),
+  ];
 
+  /* ---- Titoli mostrati nell'AppBar per ciascuna tab ---- */
   final List<String> _titles = const ['Crunchy', 'Menu', 'Location', 'Info'];
 
+  /* ---- Dialog di conferma per uscire dall'app (solo nella tab Info) ---- */
   Future<void> _tryCloseApp() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -86,11 +70,12 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
 
   @override
   Widget build(BuildContext context) {
+    /* ---- Scaffold principale: AppBar con titolo dinamico, body con pagina corrente e bottom navigation ---- */
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_currentIndex]),
         centerTitle: true,
-        // icona logout solo nella tab Info
+        /* ---- Mostro l'icona di logout (solo nella tab Info) ---- */
         actions: _currentIndex == 3
             ? [
                 IconButton(
@@ -101,7 +86,10 @@ class _CrunchyShellState extends State<CrunchyBottomBar> {
               ]
             : null,
       ),
+      /* ---- Contenuto della tab selezionata ---- */
       body: _pages[_currentIndex],
+
+      /* ---- Navigazione inferiore: 4 voci fisse con label e tooltip ---- */
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),

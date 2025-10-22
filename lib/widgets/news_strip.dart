@@ -1,3 +1,4 @@
+/* ---- Strip orizzontale "Ultime notizie": carica da NewsService e mostra cards tappabili con immagine e titolo ---- */
 import 'package:flutter/material.dart';
 import 'package:crunchy/services/news_service.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,6 +14,7 @@ class NewsStrip extends StatefulWidget {
 }
 
 class _NewsStripState extends State<NewsStrip> {
+  /* ---- Service + stato locale di caricamento/errore/lista ---- */
   final _service = NewsService();
   bool _loading = true;
   String _error = '';
@@ -24,6 +26,7 @@ class _NewsStripState extends State<NewsStrip> {
     _load();
   }
 
+  /* ---- Carica le notizie: reset stato, gestisce eccezioni e aggiorna UI se montato ---- */
   Future<void> _load() async {
     setState(() {
       _loading = true;
@@ -44,9 +47,11 @@ class _NewsStripState extends State<NewsStrip> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
+    /* ---- Colonna: titolo sezione + stato (loading/errore/lista orizzontale) ---- */
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        /* ---- Intestazione sezione ---- */
         const Padding(
           padding: EdgeInsets.fromLTRB(16, 22, 16, 10),
           child: Text(
@@ -54,11 +59,15 @@ class _NewsStripState extends State<NewsStrip> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
           ),
         ),
+
+        /* ---- Stato: spinner durante il caricamento ---- */
         if (_loading)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Center(child: CircularProgressIndicator()),
           )
+
+        /* ---- Stato: riga di errore con retry ---- */
         else if (_error.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -79,6 +88,8 @@ class _NewsStripState extends State<NewsStrip> {
               ],
             ),
           )
+
+        /* ---- Stato: lista orizzontale di articoli (card tappabili con immagine + overlay) ---- */
         else
           SizedBox(
             height: 210,
@@ -96,6 +107,7 @@ class _NewsStripState extends State<NewsStrip> {
                 final label =
                     (published != null && published.isNotEmpty) ? '$source • $published' : source;
 
+                /* ---- Card singola: immagine (con placeholder/error), badge sorgente/data, titolo e tap per aprire il link ---- */
                 return Container(
                   width: 300,
                   margin: const EdgeInsets.symmetric(vertical: 8),
@@ -125,6 +137,7 @@ class _NewsStripState extends State<NewsStrip> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
+                          /* ---- Background immagine con placeholder e fallback ---- */
                           if (img != null && img.isNotEmpty)
                             Image.network(
                               img,
@@ -138,7 +151,11 @@ class _NewsStripState extends State<NewsStrip> {
                             )
                           else
                             Container(color: cs.surfaceContainerHighest),
+
+                          /* ---- Velo scuro per aumentare il contrasto del testo ---- */
                           Container(color: Colors.black26),
+
+                          /* ---- Etichetta sorgente/data in alto a sinistra ---- */
                           Positioned(
                             top: 12,
                             left: 12,
@@ -160,6 +177,8 @@ class _NewsStripState extends State<NewsStrip> {
                               ),
                             ),
                           ),
+
+                          /* ---- Titolo in basso su due righe con ellissi ---- */
                           Positioned(
                             bottom: 16,
                             left: 12,
@@ -184,6 +203,8 @@ class _NewsStripState extends State<NewsStrip> {
               },
             ),
           ),
+
+        /* ---- Spaziatura extra sotto la strip ---- */
         const SizedBox(height: 100),
       ],
     );

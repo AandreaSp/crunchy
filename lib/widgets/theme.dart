@@ -1,18 +1,23 @@
+/* ---- Tema app: palette chiara da seed, AppBar coerente e font "Playfair Display" ---- */
 import 'package:flutter/material.dart';
 
 class AppTheme {
   static ThemeData app = ThemeData(
+    /* ---- Schema colori generato dal seed (variante chiara) ---- */
     colorScheme: ColorScheme.fromSeed(
       seedColor: const Color.fromARGB(255, 220, 200, 176),
       brightness: Brightness.light,
     ),
+
+    /* ---- Stile AppBar: colore leggermente più scuro del fondo, testo scuro, no tint/elevazione ---- */
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFDCC8B0), // più scura del fondo
+      backgroundColor: Color(0xFFDCC8B0),
       foregroundColor: Color(0xFF402E26),
       surfaceTintColor: Colors.transparent,
       elevation: 0,
     ),
 
+    /* ---- Gerarchia tipografica: titoli e testi con Playfair Display e palette coerente ---- */
     textTheme: const TextTheme(
       titleLarge: TextStyle(
         fontSize: 30,
@@ -60,7 +65,10 @@ class AppTheme {
         height: 1.2,
         fontFamily: 'Playfair Display',
       ),
-      labelLarge: TextStyle(letterSpacing: 0.5, fontFamily: 'Playfair Display'),
+      labelLarge: TextStyle(
+        letterSpacing: 0.5,
+        fontFamily: 'Playfair Display',
+      ),
     ),
   );
 }

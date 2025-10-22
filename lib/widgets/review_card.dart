@@ -1,3 +1,4 @@
+/* ---- Card per invitare alla recensione: stelle decorative, immagine e pulsante ---- */
 import 'package:flutter/material.dart';
 
 class ReviewCard extends StatelessWidget {
@@ -16,6 +17,7 @@ class ReviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
+    /* ---- Contenitore Card con bordi arrotondati, elevazione leggera e padding interno ---- */
     return Card(
       margin: margin,
       elevation: 2,
@@ -27,6 +29,7 @@ class ReviewCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            /* ---- Riga di stelle decorative ---- */
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -39,6 +42,7 @@ class ReviewCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
+            /* ---- Titolo della sezione recensioni ---- */
             Text(
               'Dacci la tua opinione',
               textAlign: TextAlign.center,
@@ -46,12 +50,14 @@ class ReviewCard extends StatelessWidget {
             ),
             const SizedBox(height: 14),
 
+            /* ---- Immagine illustrativa ritagliata con angoli arrotondati ---- */
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(imageAsset, height: 300, fit: BoxFit.cover),
             ),
             const SizedBox(height: 16),
 
+            /* ---- Pulsante: apre la scheda per scrivere la recensione ---- */
             ElevatedButton(
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(

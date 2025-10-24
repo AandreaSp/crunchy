@@ -10,7 +10,7 @@
 
     <application
         android:name="${applicationName}"
-        android:label="crunchy"
+        android:label="Crunchy"
         android:icon="@mipmap/ic_launcher">
 
         <activity
